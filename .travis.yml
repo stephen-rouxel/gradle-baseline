@@ -1,0 +1,37 @@
+##
+ # Created by brightSPARK Labs
+ # www.brightsparklabs.com
+ ##
+
+language: java
+
+jdk:
+    - openjdk8
+
+env:
+    global:
+      # GRADLE_PUBLISH_KEY
+      - secure: "PNYHs50ohNU4BB9xrfo5BMAKuu8eJy/1SlZ+PElTNxANFqI7xiKVMhh42HeMIGUnjfEEMkCtYmVOtdrsFzIOiVvWy3JUPdOCz9uD2Vn74DL4v3+EovV/gesM5TCP798cftASsjDF023I6paqHU+gG+tS/rOoT2qaozwIp4VkDvChYIOWUZbAoAXwNtB5Z9mEE8sO65Ciqwev/lcjvKttdp+VJPG0YdbMHN5rD/11IZgCAXrWPwb4/DERnieDAiW+viDITPq9zma/rbu4M1DkHjE+gD/R1bvizssQC+nemSU+s3pPIOBghM69JGz92vZObAC+b9NVmKMZ4IhDNzPTDxN7nRXAbpIIxvBub+HpwlAaTO4CDsxUni3DtJFrOoDp5QeNWXiujqh97sFO/hgqhY+YcaZbEymWNmD867v6srCo3Lvlk5tMbmZlPGC6nNvC4NMlu4m/QMJn5IJ+KFPbj2Ff/8OZbECoWJYfKyiYZLF4I3jix4xXgn0EvLGl3mhDBqyjAWL58P4C2mxaZA27c8ZKAQdUBO8PA2mFgGWc/zrl6djnsqTAhYPvtO8Jbukavhe2nzDM2SKlOOZTmSoC3kUQmx2FRRXe0Tw3ATGPczXxO/RYKN+XCGMsr/oM07GVWW0Wma8+RaiEQiept01yh1R6s694lKmrI9APQzMULxA="
+
+      # GRADLE_PUBLISH_KEY
+      -   secure: "d148BjX2zIQr1r9NUL+8MFrUNO9k/dlSMEocXaKyz3NYZub1KVDGXwH6bUj8GEPBgQ3PbGh9nr5RiFNMEB+2lD4mQU5a1bo4ymH1x6XSuwevvv+z7AzUhyUx38nYuj6adNP1F+8xKEij9XUiyrcL1LTYCHCsTzd6NCp2ERNkghSEaoM9OaQjNua6Sr+S+KBqHzRFSFzPbevGnsfLEOfGbbNNbL1q6FXxhq6mtXRMiJi6MKuEvOkoR4AP63egvjIRGFBjbfh20SUfJx/7CmcugJ4ryMraAecwPo3bl/GvK2AmJ4d/1TTzM0+waqy7tVBWw5nv+kcVuaCQrfhLDegH7GrjwiCr/938Ep04VNevkJ0pqf06lDhAIDu81Mwlo2LGhkkkl7qibfTxI/8azFJAwjJ4coG2+iU2+H5f0VQIhwEGKN7mueaUmdpT7OulJXv3fvNijlF2Vi2mn00jVqQHZTrOwea8n92k16dFDu5ouTkukTQfe5avMjfe4EED89sDCjfD6pUaILqH0WMixeSASNIAzXD+b125bGWhMT4mnwG2j/jlNUjkIOFPahKK0KtGwEyYptR4PZ3ZjKyzHNxl2QZb4enYy0f/eOXz01hoRPKYYhojyZe2/9H8baD9c5BpQPOABSz3datbCLwd86JOHcu6/sd0mTZ8mUS8UWlfcQY="
+
+notifications:
+    email:
+        recipients:
+            - enquire+travis@brightsparklabs.com
+        on_success: change
+        on_failure: always
+
+branches:
+    only:
+        - master
+
+install:
+    - ./gradlew check
+
+script:
+    - mkdir -p ~/.gradle
+    - echo "gradle.publish.key=${GRADLE_PUBLISH_KEY}" >> ~/.gradle/gradle.properties
+    - echo "gradle.publish.secret=${GRADLE_PUBLISH_SECRET}" >> ~/.gradle/gradle.properties
+    - ./gradlew publishPlugins
