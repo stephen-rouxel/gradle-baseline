@@ -61,8 +61,6 @@ public class BaselinePlugin implements Plugin<Project> {
                         licenseHeader(header)
                         // excludes all Java sources within the Groovy source dirs
                         excludeJava()
-                        // Avoid cyclic ambiguities
-                        paddedCell()
 
                         greclipse()
                         indentWithSpaces(4)
@@ -75,7 +73,7 @@ public class BaselinePlugin implements Plugin<Project> {
     private void setupCodeQuality(Project project) {
         project.plugins.apply "com.github.spotbugs"
         project.afterEvaluate {
-            project.tasks.withType(com.github.spotbugs.SpotBugsTask) {
+            project.tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
                 reports {
                     xml.enabled = false
                     html.enabled = true
@@ -88,9 +86,7 @@ public class BaselinePlugin implements Plugin<Project> {
         project.plugins.apply "jacoco"
         project.afterEvaluate {
             project.jacocoTestReport {
-                reports {
-                    html.enabled = true
-                }
+                dependsOn 'test'
             }
         }
     }
