@@ -149,7 +149,7 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
 // -----------------------------------------------------------------------------
 
 def header = """/*
-               | * Created by brightSPARK Labs in \$YEAR
+               | * Maintained by brightSPARK Labs.
                | * www.brightsparklabs.com
                | *
                | * Refer to LICENSE at repository root for license details

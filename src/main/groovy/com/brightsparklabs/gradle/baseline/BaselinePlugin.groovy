@@ -1,5 +1,5 @@
 /*
- * Created by brightSPARK Labs in 2019
+ * Maintained by brightSPARK Labs.
  * www.brightsparklabs.com
  *
  * Refer to LICENSE at repository root for license details
@@ -38,7 +38,7 @@ public class BaselinePlugin implements Plugin<Project> {
         project.plugins.apply "com.diffplug.gradle.spotless"
 
         def header = """/*
-                       | * Created by brightSPARK Labs in \$YEAR.
+                       | * Maintained by brightSPARK Labs.
                        | * www.brightsparklabs.com
                        | *
                        | * Refer to LICENSE at repository root for license details.

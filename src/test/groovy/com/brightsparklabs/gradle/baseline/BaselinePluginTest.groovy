@@ -1,5 +1,5 @@
 /*
- * Created by brightSPARK Labs in 2019
+ * Maintained by brightSPARK Labs.
  * www.brightsparklabs.com
  *
  * Refer to LICENSE at repository root for license details
