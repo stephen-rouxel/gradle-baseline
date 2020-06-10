@@ -76,6 +76,18 @@ public class BaselinePlugin implements Plugin<Project> {
             project.dependencies {
                 errorprone("com.google.errorprone:error_prone_core:2.4.0")
             }
+
+            // Set globally-applied errorprone options here
+            // Options are listed here: https://github.com/tbroyer/gradle-errorprone-plugin
+            // Example disabling 'MissingSummary' warnings:
+            /*
+            project.tasks.named("compileTestJava").configure {
+                options.errorprone.disable("MissingSummary")
+            }
+            project.tasks.named("compileJava").configure {
+                options.errorprone.disable("MissingSummary")
+            }
+            */
         }
     }
 
