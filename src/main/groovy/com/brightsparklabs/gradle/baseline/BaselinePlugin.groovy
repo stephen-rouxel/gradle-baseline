@@ -2,7 +2,7 @@
  * Maintained by brightSPARK Labs.
  * www.brightsparklabs.com
  *
- * Refer to LICENSE at repository root for license details
+ * Refer to LICENSE at repository root for license details.
  */
 
 package com.brightsparklabs.gradle.baseline
@@ -81,13 +81,13 @@ public class BaselinePlugin implements Plugin<Project> {
             // Options are listed here: https://github.com/tbroyer/gradle-errorprone-plugin
             // Example disabling 'MissingSummary' warnings:
             /*
-            project.tasks.named("compileTestJava").configure {
-                options.errorprone.disable("MissingSummary")
-            }
-            project.tasks.named("compileJava").configure {
-                options.errorprone.disable("MissingSummary")
-            }
-            */
+             project.tasks.named("compileTestJava").configure {
+             options.errorprone.disable("MissingSummary")
+             }
+             project.tasks.named("compileJava").configure {
+             options.errorprone.disable("MissingSummary")
+             }
+             */
         }
     }
 

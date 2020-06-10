@@ -1,6 +1,8 @@
 /*
- * Created brightSPARK Labs
+ * Maintained by brightSPARK Labs.
  * www.brightsparklabs.com
+ *
+ * Refer to LICENSE at repository root for license details.
  */
 
 // -----------------------------------------------------------------------------
@@ -24,7 +26,7 @@ plugins {
     // Apply the Spotless plugin for formatting
     id "com.diffplug.gradle.spotless" version "3.30.0"
 
-    // Apply the ErrorProne plugin for static code analysis
+    // Apply the Error Prone plugin for static code analysis
     id "net.ltgt.errorprone" version "1.2.1"
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks
@@ -138,7 +140,7 @@ def header = """/*
                | * Maintained by brightSPARK Labs.
                | * www.brightsparklabs.com
                | *
-               | * Refer to LICENSE at repository root for license details
+               | * Refer to LICENSE at repository root for license details.
                | */
              """.stripMargin("|")
 spotless {
@@ -156,7 +158,10 @@ spotless {
     }
     groovyGradle {
         // same as groovy, but for .gradle (defaults to "*.gradle")
+
+        // unfortunately licenseHeader is currently unsupported on groovyGradle
         //licenseHeader(header)
+
         greclipse()
         indentWithSpaces(4)
     }

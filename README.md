@@ -17,21 +17,32 @@ Applies brightSPARK Labs standardisation to gradle projects.
 // file: build.gradle
 
 plugins {
-    id 'com.brightsparklabs.gradle.baseline'
+    id 'com.brightsparklabs.gradle.baseline' version: '<version>'
 }
 ```
 
 ## Testing during development
 
-To test plugin changes during development, use an alternative repository that
-references this plugin, and do the following:
-
-- Remove the version from the plugin definition in `build.gradle`
-- Run `gradlew` tasks with `--include-build $BASELINE_PLUGIN_REPO`. i.e.
+To test plugin changes during development:
 
 ```bash
-# Within repository that references the baseline-plugin
-./gradlew --include-build $PATH_TO_BASELINE_REPO/gradle-baseline $TASK
+# bash
+
+# create a test application
+mkdir gradle-baseline-test
+cd gradle-baseline-test
+gradle init --type java-application --dsl groovy
+# add the plugin (NOTE: do not specify a version)
+sed -i "/plugins/ a id 'com.brightsparklabs.gradle.baseline'" build.gradle
+
+# setup git (plugin requires repo to be nder git control)
+git init
+git add .
+git commit "Initial commit"
+git tag -a -m "Tag v0.0.0" 0.0.0
+
+# run using the development version of the plugin
+gradlew --include-build /path/to/gradle-baseline <task>
 ```
 
 ## Bundled Plugins
@@ -42,8 +53,8 @@ The following plugins are currently bundled in automatically:
   for formatting.
     - `spotlessCheck` to check code.
     - `spotlessApply` to update code.
-- [SpotBugs](https://plugins.gradle.org/plugin/com.github.spotbugs) for static
-  code analysis.
+- [Error Prone](https://plugins.gradle.org/plugin/net.ltgt.errorprone) for
+  static code analysis.
 - [Gradle
   Versions](https://plugins.gradle.org/plugin/com.github.ben-manes.versions)
   for stale dependency checks.

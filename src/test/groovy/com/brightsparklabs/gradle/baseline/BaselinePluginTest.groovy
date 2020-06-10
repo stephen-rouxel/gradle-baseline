@@ -2,7 +2,7 @@
  * Maintained by brightSPARK Labs.
  * www.brightsparklabs.com
  *
- * Refer to LICENSE at repository root for license details
+ * Refer to LICENSE at repository root for license details.
  */
 
 package com.brightsparklabs.gradle.baseline
