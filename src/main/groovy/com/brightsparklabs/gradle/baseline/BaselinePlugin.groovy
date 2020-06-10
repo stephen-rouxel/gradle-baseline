@@ -2,7 +2,7 @@
  * Maintained by brightSPARK Labs.
  * www.brightsparklabs.com
  *
- * Refer to LICENSE at repository root for license details
+ * Refer to LICENSE at repository root for license details.
  */
 
 package com.brightsparklabs.gradle.baseline
@@ -71,14 +71,23 @@ public class BaselinePlugin implements Plugin<Project> {
     }
 
     private void setupCodeQuality(Project project) {
-        project.plugins.apply "com.github.spotbugs"
+        project.plugins.apply "net.ltgt.errorprone"
         project.afterEvaluate {
-            project.tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
-                reports {
-                    xml.enabled = false
-                    html.enabled = true
-                }
+            project.dependencies {
+                errorprone("com.google.errorprone:error_prone_core:2.4.0")
             }
+
+            // Set globally-applied errorprone options here
+            // Options are listed here: https://github.com/tbroyer/gradle-errorprone-plugin
+            // Example disabling 'MissingSummary' warnings:
+            /*
+             project.tasks.named("compileTestJava").configure {
+             options.errorprone.disable("MissingSummary")
+             }
+             project.tasks.named("compileJava").configure {
+             options.errorprone.disable("MissingSummary")
+             }
+             */
         }
     }
 
