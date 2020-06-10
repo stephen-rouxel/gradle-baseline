@@ -24,8 +24,8 @@ plugins {
     // Apply the Spotless plugin for formatting
     id "com.diffplug.gradle.spotless" version "3.30.0"
 
-    // Apply the SpotBugs plugins for static code analysis
-    id "com.github.spotbugs" version "4.2.0"
+    // Apply the ErrorProne plugin for static code analysis
+    id "net.ltgt.errorprone" version "1.2.1"
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks
     id "com.github.ben-manes.versions" version "0.28.0"
@@ -34,7 +34,6 @@ plugins {
     // Apply the OWASP plugin for vulnerability dependency checks
     id "org.owasp.dependencycheck" version "5.3.2.1"
 }
-
 
 // -----------------------------------------------------------------------------
 // REPOSITORIES/DEPENDENCIES
@@ -55,7 +54,8 @@ dependencies {
             // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE PLUGINS BLOCK
             // NOTE: Obtain plugin dependency strings from plugins.gradle.org page
             "com.diffplug.spotless:spotless-plugin-gradle:3.30.0",
-            "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.2.0",
+            "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:1.2.1",
+            "com.google.errorprone:error_prone_core:2.4.0",
             "com.github.ben-manes:gradle-versions-plugin:0.28.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.13",
             "org.owasp:dependency-check-gradle:5.3.2.1",
@@ -127,20 +127,6 @@ pluginBundle {
         baseline {
             displayName = "Gradle Baseline at brightSPARK Labs"
         }
-    }
-}
-
-// -----------------------------------------------------------------------------
-// spotbugs
-// -----------------------------------------------------------------------------
-
-spotbugs {
-    excludeFilter = file("findbugs-exclude.xml")
-}
-tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
     }
 }
 

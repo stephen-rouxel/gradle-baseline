@@ -21,6 +21,19 @@ plugins {
 }
 ```
 
+## Testing during development
+
+To test plugin changes during development, use an alternative repository that
+references this plugin, and do the following:
+
+- Remove the version from the plugin definition in `build.gradle`
+- Run `gradlew` tasks with `--include-build $BASELINE_PLUGIN_REPO`. i.e.
+
+```bash
+# Within repository that references the baseline-plugin
+./gradlew --include-build $PATH_TO_BASELINE_REPO/gradle-baseline $TASK
+```
+
 ## Bundled Plugins
 
 The following plugins are currently bundled in automatically:
