@@ -15,9 +15,10 @@ import spock.lang.Specification
  * Unit tests for {@link BaselinePlugin}.
  */
 public class BaselinePluginTest extends Specification {
+
     def "plugin registers task"() {
         given:
-        def project = ProjectBuilder.builder().build()
+        def project = ProjectBuilder.builder().withName(BaselinePlugin.TEST_PROJECT_NAME).build()
 
         when:
         project.plugins.apply("com.brightsparklabs.gradle.baseline")
