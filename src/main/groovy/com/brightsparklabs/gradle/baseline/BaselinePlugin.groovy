@@ -14,6 +14,10 @@ import org.gradle.api.Plugin
  * The brightSPARK Labs Baseline Plugin.
  */
 public class BaselinePlugin implements Plugin<Project> {
+
+    /** Project name of the test-case which specifically needs to skip loading ErrorProne */
+    public static final String TEST_PROJECT_NAME = "BaselinePluginTest-ProjectName"
+
     public void apply(Project project) {
         // set general properties
         project.group = "com.brightsparklabs"
@@ -24,10 +28,24 @@ public class BaselinePlugin implements Plugin<Project> {
 
         // enforce standards
         setupCodeFormatter(project)
-        setupCodeQuality(project)
         setupTestCoverage(project)
         setupStaleDependencyChecks(project)
         setupVulnerabilityDependencyChecks(project)
+
+        /*
+            ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
+            The exception with the missing class is:
+                java.lang.NoClassDefFoundError: org/gradle/kotlin/dsl/ConfigurationExtensionsKt
+            This needs to be loaded via the `afterEvaluate` phase of Gradle, as it needs to be
+            loaded via `dependences.errorprone` which is only available after loading the plugin.
+            With the way our test-cases run, we try to load the plugins dynamically which is
+            incompatible with loading the dependency via `afterEvaluate`.
+
+            Therefore we disable this plugin from being loaded *specifically* in the test case.
+        */
+        if (! project.getName().equals(TEST_PROJECT_NAME)) {
+            setupCodeQuality(project)
+        }
     }
 
     // --------------------------------------------------------------------------
