@@ -33,16 +33,15 @@ public class BaselinePlugin implements Plugin<Project> {
         setupVulnerabilityDependencyChecks(project)
 
         /*
-            ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
-            The exception with the missing class is:
-                java.lang.NoClassDefFoundError: org/gradle/kotlin/dsl/ConfigurationExtensionsKt
-            This needs to be loaded via the `afterEvaluate` phase of Gradle, as it needs to be
-            loaded via `dependences.errorprone` which is only available after loading the plugin.
-            With the way our test-cases run, we try to load the plugins dynamically which is
-            incompatible with loading the dependency via `afterEvaluate`.
-
-            Therefore we disable this plugin from being loaded *specifically* in the test case.
-        */
+         ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
+         The exception with the missing class is:
+         java.lang.NoClassDefFoundError: org/gradle/kotlin/dsl/ConfigurationExtensionsKt
+         This needs to be loaded via the `afterEvaluate` phase of Gradle, as it needs to be
+         loaded via `dependences.errorprone` which is only available after loading the plugin.
+         With the way our test-cases run, we try to load the plugins dynamically which is
+         incompatible with loading the dependency via `afterEvaluate`.
+         Therefore we disable this plugin from being loaded *specifically* in the test case.
+         */
         if (! project.getName().equals(TEST_PROJECT_NAME)) {
             setupCodeQuality(project)
         }
