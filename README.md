@@ -17,7 +17,7 @@ Applies brightSPARK Labs standardisation to gradle projects.
 // file: build.gradle
 
 plugins {
-    id 'com.brightsparklabs.gradle.baseline' version: '<version>'
+    id 'com.brightsparklabs.gradle.baseline' version '<version>'
 }
 ```
 
