@@ -17,6 +17,9 @@ plugins {
     // Apply the Groovy plugin to add support for Groovy
     id "groovy"
 
+    // Apply the Java plugin to add support for Java
+    id 'java'
+
     // -------------------------------------------------------------------------
     // PLUGINS THIS PLUGIN WILL APPLY WHEN ADDED
     // -------------------------------------------------------------------------
@@ -35,6 +38,9 @@ plugins {
 
     // Apply the OWASP plugin for vulnerability dependency checks
     id "org.owasp.dependencycheck" version "5.3.2.1"
+
+    // Apply the shadow plugin to build fat jars
+    id "com.github.johnrengelman.shadow" version "2.0.1"
 }
 
 // -----------------------------------------------------------------------------
@@ -72,14 +78,14 @@ dependencies {
 // -----------------------------------------------------------------------------
 
 project.description = "Applies brightSPARK Labs standardisation to gradle projects"
-project.group       = "com.brightsparklabs"
+project.group = "com.brightsparklabs"
 
-def versionProcess  = "git describe --always --dirty".execute()
+def versionProcess = "git describe --always --dirty".execute()
 versionProcess.waitFor()
-project.version     = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
+project.version = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
-project.ext.scm     = "https://github.com/brightsparklabs/gradle-baseline.git"
-project.ext.url     = "https://github.com/brightsparklabs/gradle-baseline"
+project.ext.scm = "https://github.com/brightsparklabs/gradle-baseline.git"
+project.ext.url = "https://github.com/brightsparklabs/gradle-baseline"
 
 // -----------------------------------------------------------------------------
 // java-gradle-plugin
@@ -164,5 +170,14 @@ spotless {
 
         greclipse()
         indentWithSpaces(4)
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Custom
+// -----------------------------------------------------------------------------
+task hello {
+    doLast {
+        println("Hello, world!");
     }
 }

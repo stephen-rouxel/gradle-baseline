@@ -31,6 +31,7 @@ public class BaselinePlugin implements Plugin<Project> {
         setupTestCoverage(project)
         setupStaleDependencyChecks(project)
         setupVulnerabilityDependencyChecks(project)
+        setupShadowJar(project)
 
         /*
          ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
@@ -124,5 +125,9 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupVulnerabilityDependencyChecks(final Project project) {
         project.plugins.apply "org.owasp.dependencycheck"
+    }
+
+    private void setupShadowJar(final Project project) {
+        project.plugins.apply "com.github.johnrengelman.shadow"
     }
 }
