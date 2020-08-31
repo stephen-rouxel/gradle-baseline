@@ -43,7 +43,7 @@ public class BaselinePlugin implements Plugin<Project> {
          incompatible with loading the dependency via `afterEvaluate`.
          Therefore we disable this plugin from being loaded *specifically* in the test case.
          */
-        if (! project.getName().equals(TEST_PROJECT_NAME)) {
+        if (!project.getName().equals(TEST_PROJECT_NAME)) {
             setupCodeQuality(project)
         }
     }
@@ -128,6 +128,7 @@ public class BaselinePlugin implements Plugin<Project> {
     }
 
     private void setupShadowJar(final Project project) {
+        project.plugins.apply "java"
         project.plugins.apply "com.github.johnrengelman.shadow"
     }
 }
