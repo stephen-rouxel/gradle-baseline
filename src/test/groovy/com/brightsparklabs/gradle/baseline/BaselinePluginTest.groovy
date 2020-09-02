@@ -35,5 +35,7 @@ public class BaselinePluginTest extends Specification {
         project.tasks.findByName("useLatestVersions") != null
         // shadow
         project.tasks.findByName("shadowJar") != null
+        // licence report
+        project.tasks.findByName("generateLicenseReport") != null
     }
 }
