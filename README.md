@@ -68,8 +68,8 @@ The following plugins are currently bundled in automatically:
   for vulnerability dependency checks.
     - `dependencyCheckAnalyze` to check for vulnerabilities.
 - [Shadow](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow) plugin
-  for enabling the creation of fat jars.
-    - `shadowJar` to generate fat jar.
+  enables the creation of fat jars.
+    - `shadowJar` to generate fat jars.
 
 ## Licenses
 
