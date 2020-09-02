@@ -33,5 +33,7 @@ public class BaselinePluginTest extends Specification {
         // stale dependencies
         project.tasks.findByName("dependencyUpdates") != null
         project.tasks.findByName("useLatestVersions") != null
+        // shadow
+        project.tasks.findByName("shadowJar") != null
     }
 }

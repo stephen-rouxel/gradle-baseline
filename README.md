@@ -67,6 +67,9 @@ The following plugins are currently bundled in automatically:
 - [OWASP](https://plugins.gradle.org/plugin/org.owasp.dependencycheck) plugin
   for vulnerability dependency checks.
     - `dependencyCheckAnalyze` to check for vulnerabilities.
+- [Shadow](https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow) plugin
+  enables the creation of fat jars.
+    - `shadowJar` to generate fat jars.
 
 ## Licenses
 
