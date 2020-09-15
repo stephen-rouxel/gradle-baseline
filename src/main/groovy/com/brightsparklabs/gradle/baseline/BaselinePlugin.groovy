@@ -32,7 +32,7 @@ public class BaselinePlugin implements Plugin<Project> {
         setupStaleDependencyChecks(project)
         setupVulnerabilityDependencyChecks(project)
         setupShadowJar(project)
-        setupDependencyLicenceReport(project)
+        setupDependencyLicenseReport(project)
 
         /*
          ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
@@ -133,7 +133,7 @@ public class BaselinePlugin implements Plugin<Project> {
         project.plugins.apply "com.github.johnrengelman.shadow"
     }
 
-    private void setupDependencyLicenceReport(final Project project) {
+    private void setupDependencyLicenseReport(final Project project) {
         project.plugins.apply "com.github.jk1.dependency-license-report"
     }
 }

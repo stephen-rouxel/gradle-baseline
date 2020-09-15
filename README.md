@@ -72,7 +72,7 @@ The following plugins are currently bundled in automatically:
     - `shadowJar` to generate fat jars.
 - [License Report](https://plugins.gradle.org/plugin/com.github.jk1.dependency-license-report) for 
   generating reports about the licenses of dependencies
-    - `generateLicenseReport` to generate fat jars.
+    - `generateLicenseReport` to generate a license report.
 
 ## Licenses
 
