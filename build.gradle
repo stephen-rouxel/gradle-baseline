@@ -17,6 +17,9 @@ plugins {
     // Apply the Groovy plugin to add support for Groovy
     id "groovy"
 
+    // Apply the Java plugin to add support for Java
+    id "java"
+
     // -------------------------------------------------------------------------
     // PLUGINS THIS PLUGIN WILL APPLY WHEN ADDED
     // -------------------------------------------------------------------------
@@ -35,6 +38,12 @@ plugins {
 
     // Apply the OWASP plugin for vulnerability dependency checks
     id "org.owasp.dependencycheck" version "5.3.2.1"
+
+    // Apply the shadow plugin to build fat jars
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+
+    // Apply dependency licence report plugin
+    id "com.github.jk1.dependency-license-report" version "1.14"
 }
 
 // -----------------------------------------------------------------------------
@@ -61,6 +70,8 @@ dependencies {
             "com.github.ben-manes:gradle-versions-plugin:0.28.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.13",
             "org.owasp:dependency-check-gradle:5.3.2.1",
+            "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:5.2.0",
+            "com.github.jk1:gradle-license-report:1.14"
             )
 
     // Use the awesome Spock testing and specification framework
