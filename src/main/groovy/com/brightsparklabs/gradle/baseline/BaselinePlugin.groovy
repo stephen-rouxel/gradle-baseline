@@ -28,8 +28,8 @@ public class BaselinePlugin implements Plugin<Project> {
 
         // enforce standards
         setupCodeFormatter(project)
-        setupTestCoverage(project)
         setupStaleDependencyChecks(project)
+        setupTestCoverage(project)
         setupVulnerabilityDependencyChecks(project)
         setupShadowJar(project)
         setupDependencyLicenseReport(project)
@@ -54,7 +54,7 @@ public class BaselinePlugin implements Plugin<Project> {
     // -------------------------------------------------------------------------
 
     private void setupCodeFormatter(Project project) {
-        project.plugins.apply "com.diffplug.gradle.spotless"
+        project.plugins.apply "com.diffplug.spotless"
 
         def header = """/*
                        | * Maintained by brightSPARK Labs.
