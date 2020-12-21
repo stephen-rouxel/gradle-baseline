@@ -28,8 +28,8 @@ public class BaselinePlugin implements Plugin<Project> {
 
         // enforce standards
         setupCodeFormatter(project)
-        setupTestCoverage(project)
         setupStaleDependencyChecks(project)
+        setupTestCoverage(project)
         setupVulnerabilityDependencyChecks(project)
         setupShadowJar(project)
         setupDependencyLicenseReport(project)
