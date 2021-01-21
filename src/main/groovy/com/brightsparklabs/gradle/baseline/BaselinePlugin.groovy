@@ -9,6 +9,7 @@ package com.brightsparklabs.gradle.baseline
 
 import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.Task
 
 /**
  * The brightSPARK Labs Baseline Plugin.
@@ -55,6 +56,8 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupCodeFormatter(Project project) {
         project.plugins.apply "com.diffplug.spotless"
+        addTaskAlias(project, project.spotlessApply)
+        addTaskAlias(project, project.spotlessCheck)
 
         def header = """/*
                        | * Maintained by brightSPARK Labs.
@@ -91,6 +94,7 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupCodeQuality(Project project) {
         project.plugins.apply "net.ltgt.errorprone"
+
         project.afterEvaluate {
             project.dependencies {
                 errorprone("com.google.errorprone:error_prone_core:2.4.0")
@@ -112,28 +116,52 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupTestCoverage(final Project project) {
         project.plugins.apply "jacoco"
+
         project.afterEvaluate {
-            project.jacocoTestReport {
-                dependsOn 'test'
-            }
+            project.jacocoTestReport.dependsOn 'test'
+            addTaskAlias(project, project.jacocoTestReport)
         }
     }
 
     private void setupStaleDependencyChecks(final Project project) {
         project.plugins.apply "com.github.ben-manes.versions"
+        addTaskAlias(project, project.dependencyUpdates)
+
         project.plugins.apply "se.patrikerdes.use-latest-versions"
+        addTaskAlias(project, project.useLatestVersions)
+        addTaskAlias(project, project.useLatestVersionsCheck)
     }
 
     private void setupVulnerabilityDependencyChecks(final Project project) {
         project.plugins.apply "org.owasp.dependencycheck"
+        addTaskAlias(project, project.dependencyCheckAnalyze)
     }
 
     private void setupShadowJar(final Project project) {
         project.plugins.apply "java"
         project.plugins.apply "com.github.johnrengelman.shadow"
+        addTaskAlias(project, project.shadowJar)
     }
 
     private void setupDependencyLicenseReport(final Project project) {
         project.plugins.apply "com.github.jk1.dependency-license-report"
+        addTaskAlias(project, project.generateLicenseReport)
+    }
+
+    /**
+     * Creates a task alias nested under the BSL group for clarity.
+     *
+     * @param project Gradle Project to add the task to.
+     * @param task Task to create an alias of.
+     * @param alias Name of the alias.
+     */
+    private void addTaskAlias(final Project project, final Task task) {
+        def aliasTaskName = 'bsl' + task.name.capitalize()
+        def taskDescription = "${task.description.trim()}${task.description.endsWith('.') ? '':'.'} Alias for `${task.name}`."
+        project.task(aliasTaskName) {
+            group = "brightSPARK Labs - Baseline"
+            description = taskDescription
+        }
+        project[aliasTaskName].dependsOn task
     }
 }
