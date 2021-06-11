@@ -62,8 +62,10 @@ public class BaselinePlugin implements Plugin<Project> {
         versionFile.text = project.version
 
         project.afterEvaluate {
-            project.processResources {
-              from(versionFile)
+            if (project.tasks.findByName('processResources')) {
+                project.processResources {
+                    from(versionFile)
+                }
             }
         }
     }

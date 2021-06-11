@@ -1,8 +1,14 @@
 # gradle-baseline
 
+[![Build Status
+master](https://api.travis-ci.org/brightsparklabs/gradle-baseline.svg?branch=master)](https://travis-ci.org/brightsparklabs/gradle-baseline)
+[![Gradle Plugin](https://img.shields.io/badge/gradle-latest-blue)](https://plugins.gradle.org/plugin/com.brightsparklabs.gradle.baseline)
+
 Applies brightSPARK Labs standardisation to gradle projects.
 
 ## Build
+
+Development Status: [![Build Status develop](https://api.travis-ci.org/brightsparklabs/gradle-docs.svg?branch=develop)](https://travis-ci.org/brightsparklabs/gradle-baseline)
 
 ```shell
 ./gradlew build
@@ -44,6 +50,10 @@ git tag -a -m "Tag v0.0.0" 0.0.0
 # run using the development version of the plugin
 gradlew --include-build /path/to/gradle-baseline <task>
 ```
+
+## Features
+
+- Adds a `VERSION` file to the root of the JAR containing the project version.
 
 ## Bundled Plugins
 
