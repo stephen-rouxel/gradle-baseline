@@ -28,6 +28,7 @@ public class BaselinePlugin implements Plugin<Project> {
         project.version = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
         // enforce standards
+        includeVersionInJar(project)
         setupCodeFormatter(project)
         setupStaleDependencyChecks(project)
         setupTestCoverage(project)
@@ -53,6 +54,19 @@ public class BaselinePlugin implements Plugin<Project> {
     // --------------------------------------------------------------------------
     // PRIVATE METHODS
     // -------------------------------------------------------------------------
+
+    private void includeVersionInJar(Project project) {
+        def baselineDir = project.file("${project.buildDir}/bslBaseline")
+        baselineDir.mkdirs()
+        def versionFile = project.file("${project.buildDir}/bslBaseline/VERSION")
+        versionFile.text = project.version
+
+        project.afterEvaluate {
+            project.processResources {
+              from(versionFile)
+            }
+        }
+    }
 
     private void setupCodeFormatter(Project project) {
         project.plugins.apply "com.diffplug.spotless"
