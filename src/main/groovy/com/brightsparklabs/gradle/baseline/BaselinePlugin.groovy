@@ -7,6 +7,8 @@
 
 package com.brightsparklabs.gradle.baseline
 
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import groovy.json.JsonOutput
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.Task
@@ -29,6 +31,7 @@ public class BaselinePlugin implements Plugin<Project> {
 
         // enforce standards
         includeVersionInJar(project)
+        includeDefaultAllowedLicensesInJar(project)
         setupCodeFormatter(project)
         setupStaleDependencyChecks(project)
         setupTestCoverage(project)
@@ -65,6 +68,32 @@ public class BaselinePlugin implements Plugin<Project> {
             if (project.tasks.findByName('processResources')) {
                 project.processResources {
                     from(versionFile)
+                }
+            }
+        }
+    }
+
+    private void includeDefaultAllowedLicensesInJar(Project project) {
+        def baselineDir = project.file("${project.buildDir}/bslBaseline")
+        baselineDir.mkdirs()
+        def allowedLicensesFile = project.file("${project.buildDir}/bslBaseline/allowed-licenses.json")
+        allowedLicensesFile.createNewFile()
+
+        if (allowedLicensesFile.text.equals("")) {
+            // Generates the baseline JSON of known acceptable licenses
+            allowedLicensesFile.write(JsonOutput.prettyPrint(JsonOutput.toJson([
+                allowedLicenses: [
+                    [ moduleLicense: "MIT License" ],
+                    [ moduleLicense: "Apache License, Version 2.0" ],
+                    [ moduleLicense: "PUBLIC DOMAIN" ]
+                ]
+            ])))
+
+            project.afterEvaluate {
+                if (project.tasks.findByName('processResources')) {
+                    project.processResources {
+                        from(allowedLicensesFile)
+                    }
                 }
             }
         }
@@ -161,7 +190,14 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupDependencyLicenseReport(final Project project) {
         project.plugins.apply "com.github.jk1.dependency-license-report"
+        project.afterEvaluate {
+            project.licenseReport {
+                filters = [new LicenseBundleNormalizer(createDefaultTransformationRules: true)]
+                allowedLicensesFile = new File("$project.buildDir/bslBaseline/allowed-licenses.json")
+            }
+        }
         addTaskAlias(project, project.generateLicenseReport)
+        addTaskAlias(project, project.checkLicense)
     }
 
     /**
