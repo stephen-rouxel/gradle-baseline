@@ -41,7 +41,7 @@ gradle init --type java-application --dsl groovy
 # add the plugin (NOTE: do not specify a version)
 sed -i "/plugins/ a id 'com.brightsparklabs.gradle.baseline'" build.gradle
 
-# setup git (plugin requires repo to be nder git control)
+# setup git (plugin requires repo to be under git control)
 git init
 git add .
 git commit "Initial commit"
@@ -55,6 +55,17 @@ gradlew --include-build /path/to/gradle-baseline <task>
 
 - Adds a `VERSION` file to the root of the JAR containing the project version.
 
+## Allowed Licenses
+
+By default only the following licenses for dependencies are allowed:
+
+- MIT License 
+- Apache 2.0 License
+- Public Domain License
+
+This list can be can extended for an individual project by modifying the `build/bslBaseline/allowed-licenses.json` file.
+
+The formatting for this JSON can found within the [Licence Report Docs](https://github.com/jk1/Gradle-License-Report#allowed-licenses-file)
 ## Bundled Plugins
 
 The following plugins are currently bundled in automatically:
@@ -83,6 +94,7 @@ The following plugins are currently bundled in automatically:
 - [License Report](https://plugins.gradle.org/plugin/com.github.jk1.dependency-license-report) for 
   generating reports about the licenses of dependencies
     - `generateLicenseReport` to generate a license report.
+    - `checkLicense` to verify the licenses of the dependencies are allowed.
 
 ## Licenses
 
