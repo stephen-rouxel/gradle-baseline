@@ -57,15 +57,15 @@ gradlew --include-build /path/to/gradle-baseline <task>
 
 ## Allowed Licenses
 
-By default only the following licenses for dependencies are allowed:
+By default, only the following licenses for dependencies are allowed:
 
 - MIT License 
 - Apache 2.0 License
 - Public Domain License
 
-This list can be can extended for an individual project by modifying the `build/bslBaseline/allowed-licenses.json` file.
+This default list can be modified per-project by running the `bslOverrideAllowedLicenses` task to expose the config file located at `/brightsparklabs/baseline/allowed-licenses.json`.
 
-The formatting for this JSON can found within the [Licence Report Docs](https://github.com/jk1/Gradle-License-Report#allowed-licenses-file)
+The Documentation for this JSON Format can be found within the [Licence Report Docs](https://github.com/jk1/Gradle-License-Report#allowed-licenses-file)
 ## Bundled Plugins
 
 The following plugins are currently bundled in automatically:
