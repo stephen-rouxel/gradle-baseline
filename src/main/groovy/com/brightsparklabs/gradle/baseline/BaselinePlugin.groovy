@@ -59,9 +59,9 @@ public class BaselinePlugin implements Plugin<Project> {
     // -------------------------------------------------------------------------
 
     private void includeVersionInJar(Project project) {
-        def baselineDir = project.file("${project.buildDir}/bslBaseline")
+        def baselineDir = project.file("${project.buildDir}/brightsparklabs/baseline")
         baselineDir.mkdirs()
-        def versionFile = project.file("${project.buildDir}/bslBaseline/VERSION")
+        def versionFile = project.file("${baselineDir}/VERSION")
         versionFile.text = project.version
 
         project.afterEvaluate {
