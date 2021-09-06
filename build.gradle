@@ -43,7 +43,9 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.2.0"
 
     // Apply dependency licence report plugin
-    id "com.github.jk1.dependency-license-report" version "1.16"
+    // Requires using version 1.11 or lower as the caching for the checkLicense task
+    // was changed to no longer update on file content change
+    id "com.github.jk1.dependency-license-report" version "1.11"
 }
 
 // -----------------------------------------------------------------------------
@@ -71,7 +73,7 @@ dependencies {
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.15",
             "org.owasp:dependency-check-gradle:6.0.3",
             "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:5.2.0",
-            "com.github.jk1:gradle-license-report:1.16"
+            "com.github.jk1:gradle-license-report:1.11"
             )
 
     // Use the awesome Spock testing and specification framework
