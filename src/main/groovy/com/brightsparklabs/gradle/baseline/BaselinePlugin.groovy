@@ -175,8 +175,8 @@ public class BaselinePlugin implements Plugin<Project> {
         */
         project.task("bslOverrideAllowedLicenses") {
             group = "brightSPARK Labs - Baseline"
-            description = "Creates an override file for the configuration of the types of allowed licenses " +
-                    "that are checked by the checkLicenses task."
+            description = "Creates an override file for the config of the types of allowed licenses that " +
+                    "dependencies can have. This config file is used by the `checkLicense` task."
 
             outputs.file("${overrideBaselineDir}/allowed-licenses.json")
 
@@ -196,8 +196,8 @@ public class BaselinePlugin implements Plugin<Project> {
         */
         project.task("bslGenerateAllowedLicenses") {
             group = "brightSPARK Labs - Baseline"
-            description = "Auto-runs before the checkLicense task. " +
-                    "This task generates the baseline allowed-licenses configuration file if no override file supplied."
+            description = "Generates the config file for the `checkLicense` task using either " +
+                    "the default baseline config or a supplied config override file."
 
             inputs.files("${overrideBaselineDir}/allowed-licenses.json").optional()
             outputs.file("${tmpBaselineDir}/allowed-licenses.json")
