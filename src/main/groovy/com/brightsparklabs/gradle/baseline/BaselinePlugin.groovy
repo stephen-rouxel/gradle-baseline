@@ -213,17 +213,18 @@ public class BaselinePlugin implements Plugin<Project> {
                 }
 
                 if (outputs.files.singleFile.exists()) {
-                    if (outputs.files.singleFile.text != allowedLicensesConfig) {
-                        outputs.files.singleFile.text = allowedLicensesConfig
+                    if (outputs.files.singleFile.text == allowedLicensesConfig) {
+                       return
                     }
                 }
+                outputs.files.singleFile.text = allowedLicensesConfig
             }
         }
 
         project.afterEvaluate {
             project.licenseReport {
                 filters = [new LicenseBundleNormalizer(createDefaultTransformationRules: true)]
-                allowedLicensesFile = new File("${tmpBaselineDir}allowed-licenses.json")
+                allowedLicensesFile = new File("${tmpBaselineDir}/allowed-licenses.json")
             }
 
             project.checkLicense.dependsOn project.bslGenerateAllowedLicenses
