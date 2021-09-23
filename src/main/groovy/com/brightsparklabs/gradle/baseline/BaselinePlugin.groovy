@@ -7,9 +7,10 @@
 
 package com.brightsparklabs.gradle.baseline
 
-import com.brightsparklabs.gradle.baseline.tasks.OverrideAllowedLicensesTask
-import com.brightsparklabs.gradle.baseline.tasks.CheckLicenseManageTempFileTask
+
 import com.github.jk1.license.filter.LicenseBundleNormalizer
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.Task
@@ -49,7 +50,7 @@ public class BaselinePlugin implements Plugin<Project> {
          incompatible with loading the dependency via `afterEvaluate`.
          Therefore we disable this plugin from being loaded *specifically* in the test case.
          */
-        if (! project.getName().equals(TEST_PROJECT_NAME)) {
+        if (!project.getName().equals(TEST_PROJECT_NAME)) {
             setupCodeQuality(project)
         }
     }
@@ -165,22 +166,67 @@ public class BaselinePlugin implements Plugin<Project> {
     private void setupDependencyLicenseReport(final Project project) {
         project.plugins.apply "com.github.jk1.dependency-license-report"
 
-        // Register the temp file manager and the config override tasks
-        project.tasks.register('bslCheckLicenseManageTempFile', CheckLicenseManageTempFileTask)
-        project.tasks.register('bslOverrideAllowedLicenses', OverrideAllowedLicensesTask)
+        def tmpBaselineDir = new File("${project.buildDir}/tmp/brightsparklabs/baseline/")
+        def overrideBaselineDir = new File("${project.projectDir}/brightsparklabs/baseline/")
+
+        /*
+            Creates an override file with the default configuration from the internal baseline
+            allowed-licenses.json file
+        */
+        project.task("bslOverrideAllowedLicenses") {
+            group = "brightSPARK Labs - Baseline"
+            description = "Creates an override file for the configuration of the types of allowed licenses " +
+                    "that are checked by the checkLicenses task."
+
+            outputs.file("${overrideBaselineDir}/allowed-licenses.json")
+
+            doLast {
+                if (!overrideBaselineDir.exists()) {
+                    overrideBaselineDir.mkdirs()
+                }
+
+                outputs.files.singleFile.text = getClass().getResourceAsStream("/allowed-licenses.json").getText()
+            }
+        }
+
+        /*
+            The checkLicense task requires a java.io.File type as an input, this task manages the creation of this input
+            file as a temp file in the build directory. It uses the configuration of the baseline allowed-licenses.json
+            or an override configuration file from running the bslOverrideAllowedLicenses task.
+        */
+        project.task("bslGenerateAllowedLicenses") {
+            group = "brightSPARK Labs - Baseline"
+            description = "Auto-runs before the checkLicense task. " +
+                    "This task generates the baseline allowed-licenses configuration file if no override file supplied."
+
+            inputs.files("${overrideBaselineDir}/allowed-licenses.json").optional()
+            outputs.file("${tmpBaselineDir}/allowed-licenses.json")
+
+            doLast {
+                String allowedLicensesConfig
+                def jsonSlurper = new JsonSlurper()
+
+                if (inputs.files.singleFile.exists()) {
+                    allowedLicensesConfig = JsonOutput.toJson(jsonSlurper.parseText(inputs.files.singleFile.text))
+                } else {
+                    allowedLicensesConfig = getClass().getResourceAsStream("/allowed-licenses.json").getText()
+                }
+
+                if (outputs.files.singleFile.exists()) {
+                    if (outputs.files.singleFile.text != allowedLicensesConfig) {
+                        outputs.files.singleFile.text = allowedLicensesConfig
+                    }
+                }
+            }
+        }
 
         project.afterEvaluate {
             project.licenseReport {
                 filters = [new LicenseBundleNormalizer(createDefaultTransformationRules: true)]
-                allowedLicensesFile = new File("${project.projectDir}/brightsparklabs/baseline/allowed-licenses.json")
+                allowedLicensesFile = new File("${tmpBaselineDir}allowed-licenses.json")
             }
 
-            /*
-                CheckLicense requires using a temp file as the Licence report plugin only excepts java.io.File types
-                or URLS. Because Files within the ClassPath cannot be accessed as a File type or a URL, this hidden task
-                generates a file in the build tmp directory for use when an override file is not provided.
-            */
-            project.checkLicense.dependsOn project.bslCheckLicenseManageTempFile
+            project.checkLicense.dependsOn project.bslGenerateAllowedLicenses
         }
 
         addTaskAlias(project, project.generateLicenseReport)
@@ -196,7 +242,7 @@ public class BaselinePlugin implements Plugin<Project> {
      */
     private void addTaskAlias(final Project project, final Task task) {
         def aliasTaskName = 'bsl' + task.name.capitalize()
-        def taskDescription = "${task.description.trim()}${task.description.endsWith('.') ? '':'.'} Alias for `${task.name}`."
+        def taskDescription = "${task.description.trim()}${task.description.endsWith('.') ? '' : '.'} Alias for `${task.name}`."
         project.task(aliasTaskName) {
             group = "brightSPARK Labs - Baseline"
             description = taskDescription
