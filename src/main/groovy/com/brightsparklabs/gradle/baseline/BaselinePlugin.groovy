@@ -56,6 +56,7 @@ public class BaselinePlugin implements Plugin<Project> {
         // enforce standards
         includeVersionInJar(project)
         setupCodeFormatter(project)
+        setupGitHooks(project)
         setupStaleDependencyChecks(project)
         setupTestCoverage(project)
         setupVulnerabilityDependencyChecks(project)
@@ -155,6 +156,15 @@ public class BaselinePlugin implements Plugin<Project> {
              options.errorprone.disable("MissingSummary")
              }
              */
+        }
+    }
+
+    private void setupGitHooks(Project project) {
+        project.plugins.apply "com.github.jakemarsden.git-hooks"
+
+        project.gitHooks {
+            hooks = ['pre-commit': 'spotlessApply']
+            hooksDirectory = new File("${project.projectDir}/.git/hooks")
         }
     }
 
