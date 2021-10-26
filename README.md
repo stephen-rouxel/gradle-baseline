@@ -60,6 +60,7 @@ gradlew --include-build /path/to/gradle-baseline <task>
 - Checks for dependency updates/vulnerabilities.
 - Checks for allowed license on dependencies.
 - Applies  a `VERSION` file to the root of the JAR containing the project version.
+- Adds default git-hooks to apply code formatting before making a commit.
 
 ## Allowed Licenses
 
