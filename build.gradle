@@ -43,8 +43,6 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.0"
 
     // Apply dependency licence report plugin
-    // Requires using version 2.0 or lower as the caching for the checkLicense task
-    // was changed to no longer update on file content change
     id "com.github.jk1.dependency-license-report" version "2.0"
 }
 

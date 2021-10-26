@@ -76,6 +76,10 @@ expose the config file located at `/brightsparklabs/baseline/allowed-licenses.js
 The Documentation for this JSON Format can be found within the [Licence Report
 Docs](https://github.com/jk1/Gradle-License-Report#allowed-licenses-file).
 
+### Override File Caching bug
+Due to a bug with the Licence Report plugin ([#182](https://github.com/jk1/Gradle-License-Report/issues/182), [#223](https://github.com/jk1/Gradle-License-Report/issues/223)), the contents of the override file will not be used correctly by the 
+`bslCheckLicense` task unless the contents of `/build/reports/dependency-license/` have been deleted prior to running the task.
+
 ## Bundled Plugins
 
 The following plugins are currently bundled in automatically:
