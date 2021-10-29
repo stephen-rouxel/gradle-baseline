@@ -163,8 +163,7 @@ public class BaselinePlugin implements Plugin<Project> {
         project.plugins.apply "com.github.jakemarsden.git-hooks"
 
         project.gitHooks {
-            hooks = ['pre-commit': 'spotlessApply']
-            hooksDirectory = new File("${project.projectDir}/.git/hooks")
+            hooks = ['pre-commit': 'spotlessCheck']
         }
     }
 
