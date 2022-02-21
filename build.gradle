@@ -13,6 +13,7 @@ plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     id "java-gradle-plugin"
     id "com.gradle.plugin-publish" version "0.16.0"
+    id "maven-publish"
 
     // Apply the Groovy plugin to add support for Groovy
     id "groovy"
@@ -144,6 +145,13 @@ pluginBundle {
         baseline {
             displayName = "Gradle Baseline at brightSPARK Labs"
         }
+    }
+}
+
+// Add to allow large shadowJar's to be compiled.
+configurations {
+    shadowJar {
+        zip64 true
     }
 }
 
