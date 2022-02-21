@@ -148,7 +148,9 @@ pluginBundle {
     }
 }
 
-// Add to allow large shadowJar's to be compiled.
+// By setting shadowJar zip64 to true, we allow the zip to contain more than 65k files.
+// See https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:zip64
+// This is required for building larger JARs and for publishing this plugin (which seemed to be hitting the limit)
 configurations {
     shadowJar {
         zip64 true
