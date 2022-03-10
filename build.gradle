@@ -13,6 +13,7 @@ plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     id "java-gradle-plugin"
     id "com.gradle.plugin-publish" version "0.16.0"
+    id "maven-publish"
 
     // Apply the Groovy plugin to add support for Groovy
     id "groovy"
@@ -144,6 +145,15 @@ pluginBundle {
         baseline {
             displayName = "Gradle Baseline at brightSPARK Labs"
         }
+    }
+}
+
+// By setting shadowJar zip64 to true, we allow the zip to contain more than 65k files.
+// See https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:zip64
+// This is required for building larger JARs and for publishing this plugin (which seemed to be hitting the limit)
+configurations {
+    shadowJar {
+        zip64 true
     }
 }
 

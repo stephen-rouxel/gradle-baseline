@@ -93,6 +93,8 @@ public class BaselinePlugin implements Plugin<Project> {
             if (project.tasks.findByName('processResources')) {
                 project.processResources {
                     from(versionFile)
+                    // Required by Gradle 7.
+                    duplicatesStrategy 'include'
                 }
             }
         }
@@ -138,6 +140,9 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupCodeQuality(Project project) {
         project.plugins.apply "net.ltgt.errorprone"
+
+        // ErrorProne needs to pull JARs doen so needs a repository defined.
+        project.repositories { mavenCentral() }
 
         project.afterEvaluate {
             project.dependencies {
