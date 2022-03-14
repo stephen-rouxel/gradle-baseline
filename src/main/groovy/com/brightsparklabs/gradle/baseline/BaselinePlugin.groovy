@@ -141,12 +141,15 @@ public class BaselinePlugin implements Plugin<Project> {
     private void setupCodeQuality(Project project) {
         project.plugins.apply "net.ltgt.errorprone"
 
-        // ErrorProne needs to pull JARs doen so needs a repository defined.
-        project.repositories { mavenCentral() }
 
         project.afterEvaluate {
+            // Ensure a repository is defined so the errorprone dependency below  can be obtained.
+            project.repositories { mavenCentral() }
+
+            // This needs to be added to all projects which want to use errorprone. For details
+            // refer to the errorprone plugin's `README`.
             project.dependencies {
-                errorprone("com.google.errorprone:error_prone_core:2.4.0")
+                errorprone("com.google.errorprone:error_prone_core:2.11.0")
             }
 
             // Set globally-applied errorprone options here
