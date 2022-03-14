@@ -137,7 +137,6 @@ pluginBundle {
     description = project.description
     tags = [
         "brightsparklabs",
-        "gradle",
         "baseline",
     ]
 
