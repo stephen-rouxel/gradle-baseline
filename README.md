@@ -6,6 +6,8 @@ master](https://api.travis-ci.org/brightsparklabs/gradle-baseline.svg?branch=mas
 
 Applies brightSPARK Labs standardisation to gradle projects.
 
+**NOTE: This plugin requires JDK 11 or above.**
+
 ## Build
 
 Development Status: [![Build Status develop](https://api.travis-ci.org/brightsparklabs/gradle-docs.svg?branch=develop)](https://travis-ci.org/brightsparklabs/gradle-baseline)
