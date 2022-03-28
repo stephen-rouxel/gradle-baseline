@@ -177,6 +177,19 @@ public class BaselinePlugin implements Plugin<Project> {
 
     private void setupStaleDependencyChecks(final Project project) {
         project.plugins.apply "com.github.ben-manes.versions"
+
+        def isUnstable = { String version ->
+            // Versions are deemed unstable if the version string contains a pre-release flag.
+            return version ==~ /(?i).*-(alpha|beta|rc|cr|m|pre|).*/
+        }
+
+        // Only use new dependencies versions if they are a stable release.
+        project.tasks.named("dependencyUpdates").configure {
+            rejectVersionIf {
+                isUnstable(it.candidate.version)
+            }
+        }
+
         addTaskAlias(project, project.dependencyUpdates)
 
         project.plugins.apply "se.patrikerdes.use-latest-versions"
