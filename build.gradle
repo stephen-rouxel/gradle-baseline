@@ -38,7 +38,6 @@ plugins {
     id "se.patrikerdes.use-latest-versions" version "0.2.18"
 
     // Apply the OWASP plugin for vulnerability dependency checks
-    // TODO - RAD-153: Most recent version "7.1.1" not working
     id "org.owasp.dependencycheck" version "7.1.1"
 
     // Apply the shadow plugin to build fat jars
@@ -73,8 +72,7 @@ dependencies {
             "com.google.errorprone:error_prone_core:2.11.0",
             "com.github.ben-manes:gradle-versions-plugin:0.42.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.18",
-            // TODO - RAD-153: Most recent version "7.1.1" not working
-            "org.owasp:dependency-check-gradle:7.1.0.1",
+            "org.owasp:dependency-check-gradle:7.1.1",
             "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:7.1.2",
             "com.github.jk1:gradle-license-report:2.1"
             )
