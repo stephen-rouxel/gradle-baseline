@@ -39,7 +39,7 @@ plugins {
 
     // Apply the OWASP plugin for vulnerability dependency checks
     // TODO - RAD-153: Most recent version "7.1.1" not working
-    id "org.owasp.dependencycheck" version "7.1.0.1"
+    id "org.owasp.dependencycheck" version "7.1.1"
 
     // Apply the shadow plugin to build fat jars
     id "com.github.johnrengelman.shadow" version "7.1.2"
