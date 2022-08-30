@@ -47,7 +47,8 @@ public class BaselinePlugin implements Plugin<Project> {
         this.baselineBuildDir = new File("${project.buildDir}/brightsparklabs/baseline/")
         this.baselineBuildDir.mkdirs()
         this.baselineOverrideDir = new File("${project.projectDir}/brightsparklabs/baseline/")
-        this.baselineOverrideDir.mkdirs()
+        // NOTE: Do not create `this.baselineOverrideDir` here as it is noise if empty.
+        //       Create only when files need to be written to it.
 
         // set general properties
         project.group = "com.brightsparklabs"
@@ -285,6 +286,9 @@ public class BaselinePlugin implements Plugin<Project> {
             outputs.file("${this.baselineOverrideDir}/allowed-licenses.json")
 
             doLast {
+                // Only create the directory if there is something to put in it.
+                this.baselineOverrideDir.mkdirs()
+
                 // Seed the file with the default configuration.
                 def outputFile = outputs.files.singleFile
                 outputFile.text = getClass().getResourceAsStream("/allowed-licenses.json").getText()
