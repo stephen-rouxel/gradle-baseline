@@ -10,43 +10,46 @@
 // -----------------------------------------------------------------------------
 
 plugins {
-    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
+    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins.
     id "java-gradle-plugin"
-    id "com.gradle.plugin-publish" version "0.20.0"
+    id "com.gradle.plugin-publish" version "1.0.0"
     id "maven-publish"
 
-    // Apply the Groovy plugin to add support for Groovy
+    // Apply the Groovy plugin to add support for Groovy.
     id "groovy"
 
-    // Apply the Java plugin to add support for Java
+    // Apply the Java plugin to add support for Java.
     id "java"
 
     // -------------------------------------------------------------------------
     // PLUGINS THIS PLUGIN WILL APPLY WHEN ADDED
     // -------------------------------------------------------------------------
 
-    // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE DEPENDENCIES BLOCK
+    // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE DEPENDENCIES BLOCK.
 
-    // Apply the Spotless plugin for formatting
-    id "com.diffplug.spotless" version "6.3.0"
+    // Apply the Spotless plugin for formatting.
+    id "com.diffplug.spotless" version "6.10.0"
 
-    // Apply the Error Prone plugin for static code analysis
+    // Apply the Error Prone plugin for static code analysis.
+    // NOTE: ENSURE `BaselinePlugin.ERRORPRONE_CORE_VERSION` IS UPDATED AS APPROPRIATE.
     id "net.ltgt.errorprone" version "2.0.2"
 
-    // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks
+    // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks.
     id "com.github.ben-manes.versions" version "0.42.0"
     id "se.patrikerdes.use-latest-versions" version "0.2.18"
 
-    // Apply the OWASP plugin for vulnerability dependency checks
-    id "org.owasp.dependencycheck" version "7.0.0"
+    // Apply the OWASP plugin for vulnerability dependency checks.
+    id "org.owasp.dependencycheck" version "7.1.2"
 
-    // Apply the shadow plugin to build fat jars
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-
-    // Apply dependency licence report plugin
+    // Apply dependency licence report plugin.
     // Requires using version 2.0 or lower as the caching for the checkLicense task
-    // was changed to no longer update on file content change
+    // was changed to no longer update on file content change.
     id "com.github.jk1.dependency-license-report" version "2.1"
+
+    // NOTE: Do NOT add shadow as it is irrelevant for the gradle plugin itself.
+    // Left here for info, as it WILL be applied to projects which use this plugin since fat
+    // jars support will be desired there.
+    //id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 // -----------------------------------------------------------------------------
@@ -54,9 +57,7 @@ plugins {
 // -----------------------------------------------------------------------------
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    mavenCentral()
     maven {
         url "https://plugins.gradle.org/m2/"
     }
@@ -64,23 +65,22 @@ repositories {
 
 dependencies {
     implementation(
-            // Add external plugins here so they can be added via our plugin
-            // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE PLUGINS BLOCK
-            // NOTE: Obtain plugin dependency strings from plugins.gradle.org page
-            "com.diffplug.spotless:spotless-plugin-gradle:6.3.0",
+            // Add external plugins here so they can be added via our plugin.
+            // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE PLUGINS BLOCK.
+            // NOTE: Obtain plugin dependency strings from plugins.gradle.org page.
+            "com.diffplug.spotless:spotless-plugin-gradle:6.10.0",
             "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:2.0.2",
-            "com.google.errorprone:error_prone_core:2.11.0",
+            "com.google.errorprone:error_prone_core:2.15.0",
             "com.github.ben-manes:gradle-versions-plugin:0.42.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.18",
-            "org.owasp:dependency-check-gradle:7.0.0",
+            "org.owasp:dependency-check-gradle:7.1.2",
             "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:7.1.2",
             "com.github.jk1:gradle-license-report:2.1"
             )
 
-    // Use the awesome Spock testing and specification framework
-    testImplementation "org.spockframework:spock-core:2.0-groovy-3.0"
-
-    //testImplementation 'org.codehaus.groovy:groovy-all:2.4.15'
+    // Use the awesome Spock testing and specification framework.
+    // NOTE: Need to stick with groovy-3.0 until Gradle buildscripts support Groovy 4.
+    testImplementation "org.spockframework:spock-core:2.1-M2-groovy-3.0"
 }
 
 // -----------------------------------------------------------------------------
@@ -101,17 +101,28 @@ project.ext.url     = "https://github.com/brightsparklabs/gradle-baseline"
 // java-gradle-plugin
 // -----------------------------------------------------------------------------
 
+pluginBundle {
+    website = project.url
+    vcsUrl = project.scm
+    tags = [
+        "brightsparklabs",
+        "baseline",
+    ]
+}
+
 gradlePlugin {
-    // Define the plugin
+    // Define the plugin.
     plugins {
         baseline {
             id = "com.brightsparklabs.gradle.baseline"
+            displayName = "Gradle Baseline at brightSPARK Labs"
+            description = "Applies brightSPARK Labs standardisation to gradle projects"
             implementationClass = "com.brightsparklabs.gradle.baseline.BaselinePlugin"
         }
     }
 }
 
-// Add a source set for the functional test suite
+// Add a source set for the functional test suite.
 sourceSets {
     functionalTest {
     }
@@ -127,37 +138,12 @@ task functionalTest(type: Test) {
 }
 
 check {
-    // Run the functional tests as part of `check`
+    // Run the functional tests as part of `check`.
     dependsOn(tasks.functionalTest)
 }
 
-pluginBundle {
-    website = project.url
-    vcsUrl = project.scm
-    description = project.description
-    tags = [
-        "brightsparklabs",
-        "baseline",
-    ]
-
-    plugins {
-        baseline {
-            displayName = "Gradle Baseline at brightSPARK Labs"
-        }
-    }
-}
-
-// By setting shadowJar zip64 to true, we allow the zip to contain more than 65k files.
-// See https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:zip64
-// This is required for building larger JARs and for publishing this plugin (which seemed to be hitting the limit)
-configurations {
-    shadowJar {
-        zip64 true
-    }
-}
-
 // -----------------------------------------------------------------------------
-// spotless
+// com.diffplug.spotless
 // -----------------------------------------------------------------------------
 
 def header = """/*
@@ -174,9 +160,11 @@ spotless {
     }
     groovy {
         licenseHeader(header)
-        excludeJava() // excludes all Java sources within the Groovy source dirs from formatting
-        // the Groovy Eclipse formatter extends the Java Eclipse formatter,
-        // so it formats Java files by default (unless `excludeJava` is used).
+        /* Excludes all Java sources within the Groovy source dirs from formatting. The Groovy
+         * Eclipse formatter extends the Java Eclipse formatter, so it formats Java files by
+         * default (unless `excludeJava` is used).
+         */
+        excludeJava()
         greclipse()
         indentWithSpaces(4)
     }

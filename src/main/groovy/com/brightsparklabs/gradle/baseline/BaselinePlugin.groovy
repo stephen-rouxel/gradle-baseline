@@ -7,12 +7,11 @@
 
 package com.brightsparklabs.gradle.baseline
 
-
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.Project
 import org.gradle.api.Task
 
 /**
@@ -25,6 +24,10 @@ public class BaselinePlugin implements Plugin<Project> {
 
     /** Project name of the test-case which specifically needs to skip loading ErrorProne */
     public static final String TEST_PROJECT_NAME = "BaselinePluginTest-ProjectName"
+
+    /** Version of errorprone core to add to all projects. For details of why this needs to be
+     * added, refer to the errorprone plugin's `README`. */
+    private static final String ERRORPRONE_CORE_VERSION = '2.15.0'
 
     // -------------------------------------------------------------------------
     // INSTANCE VARIABLES
@@ -44,7 +47,8 @@ public class BaselinePlugin implements Plugin<Project> {
         this.baselineBuildDir = new File("${project.buildDir}/brightsparklabs/baseline/")
         this.baselineBuildDir.mkdirs()
         this.baselineOverrideDir = new File("${project.projectDir}/brightsparklabs/baseline/")
-        this.baselineOverrideDir.mkdirs()
+        // NOTE: Do not create `this.baselineOverrideDir` here as it is noise if empty.
+        //       Create only when files need to be written to it.
 
         // set general properties
         project.group = "com.brightsparklabs"
@@ -53,7 +57,7 @@ public class BaselinePlugin implements Plugin<Project> {
         versionProcess.waitFor()
         project.version = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
-        // enforce standards
+        // Enforce standards.
         includeVersionInJar(project)
         setupCodeFormatter(project)
         setupStaleDependencyChecks(project)
@@ -114,17 +118,20 @@ public class BaselinePlugin implements Plugin<Project> {
                      """.stripMargin("|")
         project.afterEvaluate {
             project.spotless {
-                java {
-                    licenseHeader(header)
-                    googleJavaFormat().aosp()
-                }
+                // Always format Gradle files.
                 groovyGradle {
-                    // same as groovy, but for .gradle (defaults to "*.gradle")
                     greclipse()
                     indentWithSpaces(4)
                 }
 
-                if (project.plugins.hasPlugin("groovy")) {
+                if (isJavaProject(project)) {
+                    java {
+                        licenseHeader(header)
+                        googleJavaFormat().aosp()
+                    }
+                }
+
+                if (isGroovyProject(project)) {
                     groovy {
                         licenseHeader(header)
                         // excludes all Java sources within the Groovy source dirs
@@ -141,15 +148,19 @@ public class BaselinePlugin implements Plugin<Project> {
     private void setupCodeQuality(Project project) {
         project.plugins.apply "net.ltgt.errorprone"
 
-
         project.afterEvaluate {
+            if (!isJavaProject(project) && !isGroovyProject(project)) {
+                // Nothing to configure plugin for.
+                return
+            }
+
             // Ensure a repository is defined so the errorprone dependency below  can be obtained.
             project.repositories { mavenCentral() }
 
             // This needs to be added to all projects which want to use errorprone. For details
             // refer to the errorprone plugin's `README`.
             project.dependencies {
-                errorprone("com.google.errorprone:error_prone_core:2.11.0")
+                errorprone("com.google.errorprone:error_prone_core:${ERRORPRONE_CORE_VERSION}")
             }
 
             // Set globally-applied errorprone options here
@@ -163,6 +174,10 @@ public class BaselinePlugin implements Plugin<Project> {
              options.errorprone.disable("MissingSummary")
              }
              */
+            project.tasks.named("compileJava").configure {
+                // Warnings in generated code are irrelevant, ignore them.
+                options.errorprone.disableWarningsInGeneratedCode = true
+            }
         }
     }
 
@@ -170,13 +185,34 @@ public class BaselinePlugin implements Plugin<Project> {
         project.plugins.apply "jacoco"
 
         project.afterEvaluate {
-            project.jacocoTestReport.dependsOn 'test'
-            addTaskAlias(project, project.jacocoTestReport)
+            if (!isJavaProject(project) && !isGroovyProject(project)) {
+                // Nothing to configure plugin for.
+                return
+            }
+
+            // Task will only exist if its a Java project.
+            if (project.tasks.findByName('jacocoTestReport')) {
+                project.jacocoTestReport.dependsOn 'test'
+                addTaskAlias(project, project.jacocoTestReport)
+            }
         }
     }
 
     private void setupStaleDependencyChecks(final Project project) {
         project.plugins.apply "com.github.ben-manes.versions"
+
+        def isUnstable = { String version ->
+            // Versions are deemed unstable if the version string contains a pre-release flag.
+            return version ==~ /(?i).*-(alpha|beta|rc|cr|m|pre|).*/
+        }
+
+        // Only use new dependencies versions if they are a stable release.
+        project.tasks.named("dependencyUpdates").configure {
+            rejectVersionIf {
+                isUnstable(it.candidate.version)
+            }
+        }
+
         addTaskAlias(project, project.dependencyUpdates)
 
         project.plugins.apply "se.patrikerdes.use-latest-versions"
@@ -250,6 +286,9 @@ public class BaselinePlugin implements Plugin<Project> {
             outputs.file("${this.baselineOverrideDir}/allowed-licenses.json")
 
             doLast {
+                // Only create the directory if there is something to put in it.
+                this.baselineOverrideDir.mkdirs()
+
                 // Seed the file with the default configuration.
                 def outputFile = outputs.files.singleFile
                 outputFile.text = getClass().getResourceAsStream("/allowed-licenses.json").getText()
@@ -257,6 +296,26 @@ public class BaselinePlugin implements Plugin<Project> {
                 logger.lifecycle("Override file created at: [${outputFile}]")
             }
         }
+    }
+
+    /**
+     * Returns true if the project compiles Java code. Only reliable if called in `project.afterEvaluate`.
+     *
+     * @param project The project to check.
+     * @return `true` if the `java` plugin has been applied.
+     */
+    private boolean isJavaProject(Project project) {
+        return project.tasks.findByName('compileJava') != null
+    }
+
+    /**
+     * Returns true if the project compiles Groovy code. Only reliable if called in `project.afterEvaluate`.
+     *
+     * @param project The project to check.
+     * @return `true` if the `java` plugin has been applied.
+     */
+    private boolean isGroovyProject(Project project) {
+        return project.tasks.findByName('compileGroovy') != null
     }
 
     /**
