@@ -32,7 +32,7 @@ plugins {
 
     // Apply the Error Prone plugin for static code analysis.
     // NOTE: ENSURE `BaselinePlugin.ERRORPRONE_CORE_VERSION` IS UPDATED AS APPROPRIATE.
-    id "net.ltgt.errorprone" version "2.0.2"
+    id "net.ltgt.errorprone" version "3.0.1"
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks.
     id "com.github.ben-manes.versions" version "0.42.0"
