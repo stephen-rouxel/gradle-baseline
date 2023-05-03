@@ -109,6 +109,7 @@ gradlePlugin {
             id = "com.brightsparklabs.gradle.baseline"
             displayName = "Gradle Baseline at brightSPARK Labs"
             description = "Applies brightSPARK Labs standardisation to gradle projects"
+            tags.set(['brightsparklabs', 'baseline'])
             implementationClass = "com.brightsparklabs.gradle.baseline.BaselinePlugin"
         }
     }
