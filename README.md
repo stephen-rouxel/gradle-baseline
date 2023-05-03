@@ -29,6 +29,38 @@ plugins {
 }
 ```
 
+## Upgrade notes
+
+To upgrade the dependencies of this project, in the base directory (which contains the build.gradle 
+file) run the following command: 
+```bash
+./gradlew useLatestVersionsCheck
+```
+This will list all the gradle dependencies that can be upgraded, and after checking these you may run:
+```bash
+./gradlew useLatestVersions
+```
+Which will update the build.gradle file to use the versions listed by the `useLatestVersionsCheck` task.
+
+In order to update the gradle version, you should refer to the relevant documentation provided by gradle ([Example](https://docs.gradle.org/current/userguide/upgrading_version_7.html))
+```bash
+# See deprecation warnings in the console.
+gradle help --warning-mode=all
+```
+After addressing these warnings you can upgrade to the next version of gradle.
+```bash
+# Set gradle wrapper version.
+gradle wrapper --gradle-version <VERSION>
+```
+
+When bumping dependencies the `ERRORPRONE_CORE_VERSION` variable in 
+`BaselinePlugin.groovy` must match the `error_prone_core` (not the `errorprone.gradle.plugin`) 
+version, read about this in the `errorprone.gradle.plugin` 
+[Readme](https://github.com/tbroyer/gradle-errorprone-plugin). 
+
+This plugin should be tested on a local project before pushing, which can be done with the steps 
+in the *"Testing during development"* section.
+
 ## Testing during development
 
 To test plugin changes during development:
@@ -52,7 +84,7 @@ git tag -a -m "Tag v0.0.0" 0.0.0
 # run using the development version of the plugin
 gradlew --include-build /path/to/gradle-baseline <task>
 ```
-
+    
 ## Features
 
 - Standardises the following:
