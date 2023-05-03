@@ -31,7 +31,6 @@ plugins {
     id "com.diffplug.spotless" version "6.18.0"
 
     // Apply the Error Prone plugin for static code analysis.
-    // NOTE: ENSURE `BaselinePlugin.ERRORPRONE_CORE_VERSION` IS UPDATED AS APPROPRIATE.
     id "net.ltgt.errorprone" version "3.1.0"
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks.
@@ -70,6 +69,7 @@ dependencies {
             // NOTE: Obtain plugin dependency strings from plugins.gradle.org page.
             "com.diffplug.spotless:spotless-plugin-gradle:6.18.0",
             "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:3.1.0",
+            // NOTE: ENSURE `BaselinePlugin.ERRORPRONE_CORE_VERSION` IS UPDATED AS APPROPRIATE.
             "com.google.errorprone:error_prone_core:2.18.0",
             "com.github.ben-manes:gradle-versions-plugin:0.46.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.18",
