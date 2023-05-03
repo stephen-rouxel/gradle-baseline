@@ -25,7 +25,7 @@ public class BaselinePlugin implements Plugin<Project> {
     /** Project name of the test-case which specifically needs to skip loading ErrorProne */
     public static final String TEST_PROJECT_NAME = "BaselinePluginTest-ProjectName"
 
-    /** Version of errorprone core to add to all projects. For details of why this needs to be
+    /** Version of error_prone_core to add to all projects. For details of why this needs to be
      * added, refer to the errorprone plugin's `README`. */
     private static final String ERRORPRONE_CORE_VERSION = '2.18.0'
 
