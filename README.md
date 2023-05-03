@@ -1,12 +1,11 @@
 # gradle-baseline
 
-[![Build Status
-master](https://api.travis-ci.org/brightsparklabs/gradle-baseline.svg?branch=master)](https://travis-ci.org/brightsparklabs/gradle-baseline)
+[![Build Status](https://github.com/brightsparklabs/gradle-baseline/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/brightsparklabs/gradle-baseline/actions/workflows/unit_tests.yml)
 [![Gradle Plugin](https://img.shields.io/gradle-plugin-portal/v/com.brightsparklabs.gradle.baseline)](https://plugins.gradle.org/plugin/com.brightsparklabs.gradle.baseline)
 
 Applies brightSPARK Labs standardisation to gradle projects.
 
-**NOTE: This plugin requires JDK 17 or above.**
+**NOTE: This plugin requires JDK 17 or above and Gradle 8.**
 
 ## Build
 

@@ -8,8 +8,6 @@ updates:
   open-pull-requests-limit: 20
   reviewers:
   - al-jeyapal
-  - michael-lyndon-bsl
-  - mitchell-wills
   - lewis-russell
   labels:
   - dependencies
