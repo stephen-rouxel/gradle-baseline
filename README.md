@@ -28,6 +28,25 @@ plugins {
 }
 ```
 
+## Configuration
+
+Use the following configuration block to configure the plugin:
+
+```groovy
+// file: build.gradle
+
+bslBaseline {
+    /** [Optional] The license header to prefix each file with. Defaults to the below. */
+    licenseHeader = """/*
+                      | * Maintained by brightSPARK Labs.
+                      | * www.brightsparklabs.com
+                      | *
+                      | * Refer to LICENSE at repository root for license details.
+                      | */
+                    """.stripMargin("|")
+}
+```
+
 ## Upgrade notes
 
 To upgrade the dependencies of this project, in the base directory (which contains the

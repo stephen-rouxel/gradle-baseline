@@ -57,9 +57,11 @@ public class BaselinePlugin implements Plugin<Project> {
         versionProcess.waitFor()
         project.version = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
+        def config = project.extensions.create("bslBaseline", BaselinePluginExtension)
+
         // Enforce standards.
         includeVersionInJar(project)
-        setupCodeFormatter(project)
+        setupCodeFormatter(project, config)
         setupStaleDependencyChecks(project)
         setupTestCoverage(project)
         setupVulnerabilityDependencyChecks(project)
@@ -104,19 +106,15 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
-    private void setupCodeFormatter(Project project) {
+    private void setupCodeFormatter(Project project, BaselinePluginExtension config) {
         project.plugins.apply "com.diffplug.spotless"
         addTaskAlias(project, project.spotlessApply)
         addTaskAlias(project, project.spotlessCheck)
 
-        def header = """/*
-                       | * Maintained by brightSPARK Labs.
-                       | * www.brightsparklabs.com
-                       | *
-                       | * Refer to LICENSE at repository root for license details.
-                       | */
-                     """.stripMargin("|")
         project.afterEvaluate {
+            // NOTE: config is only available after project is evaluated, so retrieve in this block.
+            def header = config.licenseHeader
+
             project.spotless {
                 // Always format Gradle files.
                 groovyGradle {
