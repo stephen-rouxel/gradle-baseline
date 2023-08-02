@@ -120,12 +120,18 @@ public class BaselinePlugin implements Plugin<Project> {
                 groovyGradle {
                     greclipse()
                     indentWithSpaces(4)
+
+                    // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                    toggleOffOn()
                 }
 
                 if (isJavaProject(project)) {
                     java {
                         licenseHeader(header)
                         googleJavaFormat().aosp()
+
+                        // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                        toggleOffOn()
                     }
                 }
 
@@ -137,6 +143,9 @@ public class BaselinePlugin implements Plugin<Project> {
 
                         greclipse()
                         indentWithSpaces(4)
+
+                        // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                        toggleOffOn()
                     }
                 }
             }
