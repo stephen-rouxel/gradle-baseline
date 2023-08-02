@@ -143,6 +143,15 @@ The following plugins are currently bundled in automatically:
   for formatting.
     - `spotlessCheck` to check code.
     - `spotlessApply` to update code.
+    - Formatting can be disabled for blocks of code if needed via:
+
+            // spotless:off
+            final var doNotFormat =
+              this
+                .specific()
+                    .codeBlock()
+            // spotless:on
+
 - [Error Prone](https://plugins.gradle.org/plugin/net.ltgt.errorprone) for
   static code analysis.
 - [Gradle
