@@ -27,7 +27,7 @@ public class BaselinePlugin implements Plugin<Project> {
 
     /** Version of error_prone_core to add to all projects. For details of why this needs to be
      * added, refer to the errorprone plugin's `README`. */
-    private static final String ERRORPRONE_CORE_VERSION = '2.18.0'
+    private static final String ERRORPRONE_CORE_VERSION = '2.20.0'
 
     // -------------------------------------------------------------------------
     // INSTANCE VARIABLES
@@ -120,12 +120,18 @@ public class BaselinePlugin implements Plugin<Project> {
                 groovyGradle {
                     greclipse()
                     indentWithSpaces(4)
+
+                    // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                    toggleOffOn()
                 }
 
                 if (isJavaProject(project)) {
                     java {
                         licenseHeader(header)
                         googleJavaFormat().aosp()
+
+                        // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                        toggleOffOn()
                     }
                 }
 
@@ -137,6 +143,9 @@ public class BaselinePlugin implements Plugin<Project> {
 
                         greclipse()
                         indentWithSpaces(4)
+
+                        // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                        toggleOffOn()
                     }
                 }
             }
