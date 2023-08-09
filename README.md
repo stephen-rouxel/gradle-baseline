@@ -9,8 +9,6 @@ Applies brightSPARK Labs standardisation to gradle projects.
 
 ## Build
 
-Development Status: [![Build Status develop](https://api.travis-ci.org/brightsparklabs/gradle-docs.svg?branch=develop)](https://travis-ci.org/brightsparklabs/gradle-baseline)
-
 ```shell
 ./gradlew build
 
