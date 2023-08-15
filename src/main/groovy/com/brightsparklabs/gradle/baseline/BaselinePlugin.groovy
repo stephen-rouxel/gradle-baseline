@@ -25,9 +25,9 @@ public class BaselinePlugin implements Plugin<Project> {
     /** Project name of the test-case which specifically needs to skip loading ErrorProne */
     public static final String TEST_PROJECT_NAME = "BaselinePluginTest-ProjectName"
 
-    /** Version of errorprone core to add to all projects. For details of why this needs to be
+    /** Version of error_prone_core to add to all projects. For details of why this needs to be
      * added, refer to the errorprone plugin's `README`. */
-    private static final String ERRORPRONE_CORE_VERSION = '2.18.0'
+    private static final String ERRORPRONE_CORE_VERSION = '2.20.0'
 
     // -------------------------------------------------------------------------
     // INSTANCE VARIABLES
@@ -57,9 +57,11 @@ public class BaselinePlugin implements Plugin<Project> {
         versionProcess.waitFor()
         project.version = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
+        def config = project.extensions.create("bslBaseline", BaselinePluginExtension)
+
         // Enforce standards.
         includeVersionInJar(project)
-        setupCodeFormatter(project)
+        setupCodeFormatter(project, config)
         setupStaleDependencyChecks(project)
         setupTestCoverage(project)
         setupVulnerabilityDependencyChecks(project)
@@ -104,30 +106,32 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
-    private void setupCodeFormatter(Project project) {
+    private void setupCodeFormatter(Project project, BaselinePluginExtension config) {
         project.plugins.apply "com.diffplug.spotless"
         addTaskAlias(project, project.spotlessApply)
         addTaskAlias(project, project.spotlessCheck)
 
-        def header = """/*
-                       | * Maintained by brightSPARK Labs.
-                       | * www.brightsparklabs.com
-                       | *
-                       | * Refer to LICENSE at repository root for license details.
-                       | */
-                     """.stripMargin("|")
         project.afterEvaluate {
+            // NOTE: config is only available after project is evaluated, so retrieve in this block.
+            def header = config.licenseHeader
+
             project.spotless {
                 // Always format Gradle files.
                 groovyGradle {
                     greclipse()
                     indentWithSpaces(4)
+
+                    // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                    toggleOffOn()
                 }
 
                 if (isJavaProject(project)) {
                     java {
                         licenseHeader(header)
                         googleJavaFormat().aosp()
+
+                        // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                        toggleOffOn()
                     }
                 }
 
@@ -139,6 +143,9 @@ public class BaselinePlugin implements Plugin<Project> {
 
                         greclipse()
                         indentWithSpaces(4)
+
+                        // Allow formatting to be disabled via: `spotless:off` / `spotless:on` comments.
+                        toggleOffOn()
                     }
                 }
             }
