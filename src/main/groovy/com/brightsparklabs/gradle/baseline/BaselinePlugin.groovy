@@ -8,11 +8,22 @@
 package com.brightsparklabs.gradle.baseline
 
 import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.google.common.base.Strings
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.S3Exception
+
+import java.nio.file.Files
+import java.nio.file.NoSuchFileException
+import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * The brightSPARK Labs Baseline Plugin.
@@ -67,6 +78,7 @@ public class BaselinePlugin implements Plugin<Project> {
         setupVulnerabilityDependencyChecks(project)
         setupShadowJar(project)
         setupDependencyLicenseReport(project)
+        setupDeployment(project, config)
 
         /*
          * ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
@@ -303,6 +315,68 @@ public class BaselinePlugin implements Plugin<Project> {
                 logger.lifecycle("Override file created at: [${outputFile}]")
             }
         }
+    }
+
+    private void setupDeployment(final Project project, final BaselinePluginExtension config) {
+        project.afterEvaluate {
+            // NOTE: config is only available after project is evaluated, so retrieve in this block.
+            setupDeployToS3(project, config.deploy.s3)
+        }
+    }
+
+    private void setupDeployToS3(final Project project, final S3DeployConfig s3DeployConfig) {
+        final String bucketName = s3DeployConfig.bucketName
+        final String prefix = s3DeployConfig.prefix
+        final Set<String> filesToUpload = s3DeployConfig.filesToUpload
+
+        project.tasks.register("bslDeployToS3") {
+            group = "brightSPARK Labs - Baseline"
+            description = "Deploys built files to S3."
+
+            if (Strings.isNullOrEmpty(bucketName) || filesToUpload == null || filesToUpload.
+                    isEmpty()) {
+                logger.lifecycle("Aborted task `${name}`. Missing configuration.")
+                return
+            }
+
+            final Region region = Region.AP_SOUTHEAST_2;
+            final S3Client s3 = S3Client.builder()
+                    .region(region)
+                    .build()
+
+            try {
+                for (String file : filesToUpload) {
+                    final Path filePath = Paths.get(file)
+                    if (!Files.exists(filePath)) {
+                        logger.error("No such file: `${filePath}`")
+                        return
+                    }
+
+                    final String fileName = getPrefixedFileName(filePath, prefix)
+
+                    final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(fileName)
+                            .build() as PutObjectRequest
+
+                    s3.putObject(putObjectRequest, RequestBody.fromFile(filePath.toFile()))
+                    System.out.println("Successfully placed " + fileName +" into bucket "+bucketName)
+                }
+            } catch (NoSuchFileException e) {
+                logger.error("No such file: "+e)
+            } catch (S3Exception e) {
+                logger.error(e.getMessage());
+                throw e
+            }
+        }
+    }
+
+    private String getPrefixedFileName(final Path filePath, final String prefix) {
+        final String fileName = filePath.getFileName().toString()
+        if (fileName.startsWith(prefix)) {
+            return fileName
+        }
+        return "${prefix}-${fileName}"
     }
 
     /**

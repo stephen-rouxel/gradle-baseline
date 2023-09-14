@@ -19,4 +19,16 @@ class BaselinePluginExtension {
                              | * Refer to LICENSE at repository root for license details.
                              | */
                            """.stripMargin("|")
+
+    DeployConfig deploy = new DeployConfig()
+}
+
+class DeployConfig {
+    S3DeployConfig s3 = new S3DeployConfig()
+}
+
+class S3DeployConfig {
+    String bucketName
+    String prefix = ""
+    Set<String> filesToUpload
 }
