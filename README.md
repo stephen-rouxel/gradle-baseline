@@ -42,6 +42,22 @@ bslBaseline {
                       | * Refer to LICENSE at repository root for license details.
                       | */
                     """.stripMargin("|")
+    
+    // [Optional] S3 bucket file upload configuration.
+    /** The name of the S3 bucket to upload files to. */
+    deploy.s3.bucketName = "bsl.customer.project.environment.aws.s3.service"
+    /**
+     * [Optional] The region of the S3 bucket. If unset, the AWS SDK will attempt to pull the region
+     * from the system.
+     */
+    deploy.s3.region = "ap-southeast-2"
+    /** [Optional] The prefix to prepend to uploaded files.*/
+    deploy.s3.prefix = "${projectName}-${version}"
+    /** The paths of the files to upload to the S3 bucket. */
+    deploy.s3.filesToUpload = [
+            "${layout.buildDirectory.dir('dist').get()}/release.tgz",
+            "${layout.buildDirectory.dir('dist').get()}/release.tgz.sha256",
+    ]
 }
 ```
 
@@ -118,6 +134,7 @@ gradlew --include-build /path/to/gradle-baseline <task>
 - Checks for dependency updates/vulnerabilities.
 - Checks for allowed license on dependencies.
 - Applies  a `VERSION` file to the root of the JAR containing the project version.
+- Adds a task to upload files to an S3 bucket.
 
 ## Allowed Licenses
 

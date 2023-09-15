@@ -17,6 +17,7 @@ import org.gradle.api.Task
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.S3ClientBuilder
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.S3Exception
 
@@ -315,6 +316,12 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
+    /**
+     * Setup tasks that deploy releases.
+     *
+     * @param project The Gradle Project object.
+     * @param config The Baseline Plugin configuration object.
+     */
     private void setupDeployment(final Project project, final BaselinePluginExtension config) {
         project.afterEvaluate {
             // NOTE: config is only available after project is evaluated, so retrieve in this block.
@@ -322,14 +329,22 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
+    /**
+     * Setup the `bslDeployToS3` task that deploys release files to an S3 bucket.
+     *
+     * @param project The Gradle Project object.
+     * @param s3DeployConfig The S3 deployment configuration object.
+     */
     private void setupDeployToS3(final Project project, final S3DeployConfig s3DeployConfig) {
         final String bucketName = s3DeployConfig.bucketName
+        final String region = s3DeployConfig.region
         final String prefix = s3DeployConfig.prefix
         final Set<String> filesToUpload = s3DeployConfig.filesToUpload
 
         project.task("bslDeployToS3") {
             group = "brightSPARK Labs - Baseline"
-            description = "Deploys built files to S3."
+            description = "Upload files to an S3 bucket. Configure via the `bslBaseline` " +
+                    "configuration block."
 
             doLast {
                 if (Strings.isNullOrEmpty(bucketName) || filesToUpload == null || filesToUpload.
@@ -338,10 +353,13 @@ public class BaselinePlugin implements Plugin<Project> {
                     return
                 }
 
-                final Region region = Region.AP_SOUTHEAST_2;
-                final S3Client s3 = S3Client.builder()
-                        .region(region)
-                        .build()
+                final S3ClientBuilder s3Builder = S3Client.builder()
+                // By default, the AWS SDK will attempt to pull the region from the system.
+                // If configured, we allow for an optional override.
+                if (!Strings.isNullOrEmpty(region)) {
+                    s3Builder.region(Region.of(region))
+                }
+                final S3Client s3 = s3Builder.build()
 
                 try {
                     for (String file : filesToUpload) {
@@ -354,7 +372,9 @@ public class BaselinePlugin implements Plugin<Project> {
                                 .build() as PutObjectRequest
 
                         s3.putObject(putObjectRequest, RequestBody.fromFile(filePath.toFile()))
-                        System.out.println("Successfully placed " + fileName +" into bucket "+bucketName)
+
+                        logger.lifecycle("Successfully placed file `${fileName}` into bucket " +
+                                "`${bucketName}`.")
                     }
                 } catch (S3Exception e) {
                     logger.error("An S3Exception occurred. This may have been caused by an " +
@@ -365,6 +385,14 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
+    /**
+     * Return the filename from the given Path with the given prefix prepended. If the filename
+     * already has the given prefix, the filename is returned as is.
+     *
+     * @param filePath The file path.
+     * @param prefix The desired filename prefix.
+     * @return The name of the file, with the given prefix.
+     */
     private String getPrefixedFileName(final Path filePath, final String prefix) {
         final String fileName = filePath.getFileName().toString()
         if (fileName.startsWith(prefix)) {
