@@ -20,8 +20,6 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.S3Exception
 
-import java.nio.file.Files
-import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -329,44 +327,40 @@ public class BaselinePlugin implements Plugin<Project> {
         final String prefix = s3DeployConfig.prefix
         final Set<String> filesToUpload = s3DeployConfig.filesToUpload
 
-        project.tasks.register("bslDeployToS3") {
+        project.task("bslDeployToS3") {
             group = "brightSPARK Labs - Baseline"
             description = "Deploys built files to S3."
 
-            if (Strings.isNullOrEmpty(bucketName) || filesToUpload == null || filesToUpload.
-                    isEmpty()) {
-                logger.lifecycle("Aborted task `${name}`. Missing configuration.")
-                return
-            }
-
-            final Region region = Region.AP_SOUTHEAST_2;
-            final S3Client s3 = S3Client.builder()
-                    .region(region)
-                    .build()
-
-            try {
-                for (String file : filesToUpload) {
-                    final Path filePath = Paths.get(file)
-                    if (!Files.exists(filePath)) {
-                        logger.error("No such file: `${filePath}`")
-                        return
-                    }
-
-                    final String fileName = getPrefixedFileName(filePath, prefix)
-
-                    final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(fileName)
-                            .build() as PutObjectRequest
-
-                    s3.putObject(putObjectRequest, RequestBody.fromFile(filePath.toFile()))
-                    System.out.println("Successfully placed " + fileName +" into bucket "+bucketName)
+            doLast {
+                if (Strings.isNullOrEmpty(bucketName) || filesToUpload == null || filesToUpload.
+                        isEmpty()) {
+                    // Return early if missing configuration.
+                    return
                 }
-            } catch (NoSuchFileException e) {
-                logger.error("No such file: "+e)
-            } catch (S3Exception e) {
-                logger.error(e.getMessage());
-                throw e
+
+                final Region region = Region.AP_SOUTHEAST_2;
+                final S3Client s3 = S3Client.builder()
+                        .region(region)
+                        .build()
+
+                try {
+                    for (String file : filesToUpload) {
+                        final Path filePath = Paths.get(file)
+                        final String fileName = getPrefixedFileName(filePath, prefix)
+
+                        final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(fileName)
+                                .build() as PutObjectRequest
+
+                        s3.putObject(putObjectRequest, RequestBody.fromFile(filePath.toFile()))
+                        System.out.println("Successfully placed " + fileName +" into bucket "+bucketName)
+                    }
+                } catch (S3Exception e) {
+                    logger.error("An S3Exception occurred. This may have been caused by an " +
+                            "incorrect `deploy.s3.bucketName` configuration.")
+                    throw e
+                }
             }
         }
     }
