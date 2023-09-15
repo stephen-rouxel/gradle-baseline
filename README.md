@@ -47,8 +47,8 @@ bslBaseline {
     /** The name of the S3 bucket to upload files to. */
     deploy.s3.bucketName = "bsl.customer.project.environment.aws.s3.service"
     /**
-     * [Optional] The region of the S3 bucket. If unset, the AWS SDK will attempt to pull the region
-     * from the system.
+     * [Optional] The region of the S3 bucket. If unset, the AWS SDK will attempt to pull the
+     * region from the system.
      */
     deploy.s3.region = "ap-southeast-2"
     /** [Optional] The prefix to prepend to uploaded files.*/
