@@ -199,7 +199,7 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
-    private void setupTestCoverage(final Project project) {
+    private static void setupTestCoverage(final Project project) {
         project.plugins.apply "jacoco"
 
         project.afterEvaluate {
@@ -238,12 +238,12 @@ public class BaselinePlugin implements Plugin<Project> {
         addTaskAlias(project, project.useLatestVersionsCheck)
     }
 
-    private void setupVulnerabilityDependencyChecks(final Project project) {
+    private static void setupVulnerabilityDependencyChecks(final Project project) {
         project.plugins.apply "org.owasp.dependencycheck"
         addTaskAlias(project, project.dependencyCheckAnalyze)
     }
 
-    private void setupShadowJar(final Project project) {
+    private static void setupShadowJar(final Project project) {
         project.plugins.apply "java"
         project.plugins.apply "com.github.johnrengelman.shadow"
         addTaskAlias(project, project.shadowJar)
@@ -322,7 +322,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param project The Gradle Project object.
      * @param config The Baseline Plugin configuration object.
      */
-    private void setupDeployment(final Project project, final BaselinePluginExtension config) {
+    private static void setupDeployment(final Project project, final BaselinePluginExtension config) {
         project.afterEvaluate {
             // NOTE: config is only available after project is evaluated, so retrieve in this block.
             setupDeployToS3(project, config.deploy.s3)
@@ -335,7 +335,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param project The Gradle Project object.
      * @param s3DeployConfig The S3 deployment configuration object.
      */
-    private void setupDeployToS3(final Project project, final S3DeployConfig s3DeployConfig) {
+    private static void setupDeployToS3(final Project project, final S3DeployConfig s3DeployConfig) {
         final String bucketName = s3DeployConfig.bucketName
         final String region = s3DeployConfig.region
         final String prefix = s3DeployConfig.prefix
@@ -362,7 +362,7 @@ public class BaselinePlugin implements Plugin<Project> {
                 final S3Client s3 = s3Builder.build()
 
                 try {
-                    for (String file : filesToUpload) {
+                    filesToUpload.each { file ->
                         final Path filePath = Paths.get(file)
                         final String fileName = getPrefixedFileName(filePath, prefix)
 
@@ -373,12 +373,10 @@ public class BaselinePlugin implements Plugin<Project> {
 
                         s3.putObject(putObjectRequest, RequestBody.fromFile(filePath.toFile()))
 
-                        logger.lifecycle("Successfully placed file `${fileName}` into bucket " +
-                                "`${bucketName}`.")
+                        logger.lifecycle("Successfully uploaded file `${fileName}` into bucket `${bucketName}`.")
                     }
                 } catch (S3Exception e) {
-                    logger.error("An S3Exception occurred. This may have been caused by an " +
-                            "incorrect `deploy.s3.bucketName` configuration.")
+                    logger.error("An S3Exception occurred. This may have been caused by an incorrect `deploy.s3.bucketName` configuration.")
                     throw e
                 }
             }
@@ -393,12 +391,13 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param prefix The desired filename prefix.
      * @return The name of the file, with the given prefix.
      */
-    private String getPrefixedFileName(final Path filePath, final String prefix) {
+    private static String getPrefixedFileName(final Path filePath, final String prefix) {
         final String fileName = filePath.getFileName().toString()
         if (fileName.startsWith(prefix)) {
+            // Prefix already present, do not prepend again.
             return fileName
         }
-        return "${prefix}-${fileName}"
+        return "${prefix}${fileName}"
     }
 
     /**
@@ -407,7 +406,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param project The project to check.
      * @return `true` if the `java` plugin has been applied.
      */
-    private boolean isJavaProject(Project project) {
+    private static boolean isJavaProject(Project project) {
         return project.tasks.findByName('compileJava') != null
     }
 
@@ -417,7 +416,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param project The project to check.
      * @return `true` if the `java` plugin has been applied.
      */
-    private boolean isGroovyProject(Project project) {
+    private static boolean isGroovyProject(Project project) {
         return project.tasks.findByName('compileGroovy') != null
     }
 
@@ -428,7 +427,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param task Task to create an alias of.
      * @param alias Name of the alias.
      */
-    private void addTaskAlias(final Project project, final Task task) {
+    private static void addTaskAlias(final Project project, final Task task) {
         def aliasTaskName = 'bsl' + task.name.capitalize()
         def taskDescription = "${task.description.trim()}${task.description.endsWith('.') ? '' : '.'} Alias for `${task.name}`."
         project.task(aliasTaskName) {
