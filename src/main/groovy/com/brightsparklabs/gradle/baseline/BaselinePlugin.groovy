@@ -341,31 +341,31 @@ public class BaselinePlugin implements Plugin<Project> {
         final String prefix = s3DeployConfig.prefix
         final Set<String> filesToUpload = s3DeployConfig.filesToUpload
 
-        if (Strings.isNullOrEmpty(bucketName) && (filesToUpload == null || filesToUpload.
-                isEmpty())) {
-            // Return early if unset configuration. This prevents the task being added.
+        final def bucketNameIsEmpty = Strings.isNullOrEmpty(bucketName)
+        final def filesToUploadIsEmpty = filesToUpload == null || filesToUpload.isEmpty()
+        if (bucketNameIsEmpty && filesToUploadIsEmpty) {
+            // Both those keys are not sent, indicating that the user does not plan to upload
+            // anything to S3. No point adding the task, so return early.
             return
+        }
+
+        // Error early if configuration in invalid.
+        if (bucketNameIsEmpty) {
+            def error = "`bslGradle.deploy.s3.bucketName` cannot be null or empty. Value was: `${bucketName}`"
+            project.logger.error(error)
+            throw new IllegalStateException(error)
+        }
+        if (filesToUploadIsEmpty) {
+            def error = "`bslGradle.deploy.s3.filesToUpload` cannot be null or empty. Value was: ${filesToUpload}"
+            project.logger.error(error)
+            throw new IllegalStateException(error)
         }
 
         project.task("bslDeployToS3") {
             group = "brightSPARK Labs - Baseline"
-            description = "Upload files to an S3 bucket. Configure via the `bslBaseline` " +
-                    "configuration block."
+            description = "Upload files to an S3 bucket. Configure via the `bslBaseline` configuration block."
 
             doLast {
-                // Throw an error if missing required configuration.
-                String missingConfig = null
-                if (Strings.isNullOrEmpty(bucketName)) {
-                    missingConfig = "deploy.s3.bucketName"
-                }
-                if (filesToUpload == null || filesToUpload.isEmpty()) {
-                    missingConfig = "deploy.s3.filesToUpload"
-                }
-                if (!Strings.isNullOrEmpty(missingConfig)) {
-                    throw new IllegalStateException("Missing configuration for task " +
-                    "`bslDeployToS3`: `${missingConfig}`")
-                }
-
                 final S3ClientBuilder s3Builder = S3Client.builder()
                 // By default, the AWS SDK will attempt to pull the region from the system.
                 // If configured, we allow for an optional override.
