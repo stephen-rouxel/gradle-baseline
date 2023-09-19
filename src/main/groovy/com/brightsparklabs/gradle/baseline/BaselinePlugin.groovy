@@ -8,11 +8,21 @@
 package com.brightsparklabs.gradle.baseline
 
 import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.google.common.base.Strings
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.S3ClientBuilder
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.S3Exception
+
+import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * The brightSPARK Labs Baseline Plugin.
@@ -67,6 +77,7 @@ public class BaselinePlugin implements Plugin<Project> {
         setupVulnerabilityDependencyChecks(project)
         setupShadowJar(project)
         setupDependencyLicenseReport(project)
+        setupDeployment(project, config)
 
         /*
          * ErrorProne cannot be loaded dynamically in our test case due to a class-loading exception
@@ -188,7 +199,7 @@ public class BaselinePlugin implements Plugin<Project> {
         }
     }
 
-    private void setupTestCoverage(final Project project) {
+    private static void setupTestCoverage(final Project project) {
         project.plugins.apply "jacoco"
 
         project.afterEvaluate {
@@ -227,12 +238,12 @@ public class BaselinePlugin implements Plugin<Project> {
         addTaskAlias(project, project.useLatestVersionsCheck)
     }
 
-    private void setupVulnerabilityDependencyChecks(final Project project) {
+    private static void setupVulnerabilityDependencyChecks(final Project project) {
         project.plugins.apply "org.owasp.dependencycheck"
         addTaskAlias(project, project.dependencyCheckAnalyze)
     }
 
-    private void setupShadowJar(final Project project) {
+    private static void setupShadowJar(final Project project) {
         project.plugins.apply "java"
         project.plugins.apply "com.github.johnrengelman.shadow"
         addTaskAlias(project, project.shadowJar)
@@ -306,12 +317,109 @@ public class BaselinePlugin implements Plugin<Project> {
     }
 
     /**
+     * Setup tasks that deploy releases.
+     *
+     * @param project The Gradle Project object.
+     * @param config The Baseline Plugin configuration object.
+     */
+    private static void setupDeployment(final Project project, final BaselinePluginExtension config) {
+        project.afterEvaluate {
+            // NOTE: config is only available after project is evaluated, so retrieve in this block.
+            setupDeployToS3(project, config.deploy.s3)
+        }
+    }
+
+    /**
+     * Setup the `bslDeployToS3` task that deploys release files to an S3 bucket.
+     *
+     * @param project The Gradle Project object.
+     * @param s3DeployConfig The S3 deployment configuration object.
+     */
+    private static void setupDeployToS3(final Project project, final S3DeployConfig s3DeployConfig) {
+        final String bucketName = s3DeployConfig.bucketName
+        final String region = s3DeployConfig.region
+        final String prefix = s3DeployConfig.prefix
+        final Set<String> filesToUpload = s3DeployConfig.filesToUpload
+
+        final def bucketNameIsEmpty = Strings.isNullOrEmpty(bucketName)
+        final def filesToUploadIsEmpty = filesToUpload == null || filesToUpload.isEmpty()
+        if (bucketNameIsEmpty && filesToUploadIsEmpty) {
+            // Both those keys are not sent, indicating that the user does not plan to upload
+            // anything to S3. No point adding the task, so return early.
+            return
+        }
+
+        // Error early if configuration in invalid.
+        if (bucketNameIsEmpty) {
+            def error = "`bslGradle.deploy.s3.bucketName` cannot be null or empty. Value was: `${bucketName}`"
+            project.logger.error(error)
+            throw new IllegalStateException(error)
+        }
+        if (filesToUploadIsEmpty) {
+            def error = "`bslGradle.deploy.s3.filesToUpload` cannot be null or empty. Value was: ${filesToUpload}"
+            project.logger.error(error)
+            throw new IllegalStateException(error)
+        }
+
+        project.task("bslDeployToS3") {
+            group = "brightSPARK Labs - Baseline"
+            description = "Upload files to an S3 bucket. Configure via the `bslBaseline` configuration block."
+
+            doLast {
+                final S3ClientBuilder s3Builder = S3Client.builder()
+                // By default, the AWS SDK will attempt to pull the region from the system.
+                // If configured, we allow for an optional override.
+                if (!Strings.isNullOrEmpty(region)) {
+                    s3Builder.region(Region.of(region))
+                }
+                final S3Client s3 = s3Builder.build()
+
+                try {
+                    filesToUpload.each { file ->
+                        final Path filePath = Paths.get(file)
+                        final String fileName = getPrefixedFileName(filePath, prefix)
+
+                        final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(fileName)
+                                .build() as PutObjectRequest
+
+                        s3.putObject(putObjectRequest, RequestBody.fromFile(filePath.toFile()))
+
+                        logger.lifecycle("Successfully uploaded file `${fileName}` into bucket `${bucketName}`.")
+                    }
+                } catch (S3Exception e) {
+                    logger.error("An S3Exception occurred. This may have been caused by an incorrect `deploy.s3.bucketName` configuration.")
+                    throw e
+                }
+            }
+        }
+    }
+
+    /**
+     * Return the filename from the given Path with the given prefix prepended. If the filename
+     * already has the given prefix, the filename is returned as is.
+     *
+     * @param filePath The file path.
+     * @param prefix The desired filename prefix.
+     * @return The name of the file, with the given prefix.
+     */
+    private static String getPrefixedFileName(final Path filePath, final String prefix) {
+        final String fileName = filePath.getFileName().toString()
+        if (fileName.startsWith(prefix)) {
+            // Prefix already present, do not prepend again.
+            return fileName
+        }
+        return "${prefix}${fileName}"
+    }
+
+    /**
      * Returns true if the project compiles Java code. Only reliable if called in `project.afterEvaluate`.
      *
      * @param project The project to check.
      * @return `true` if the `java` plugin has been applied.
      */
-    private boolean isJavaProject(Project project) {
+    private static boolean isJavaProject(Project project) {
         return project.tasks.findByName('compileJava') != null
     }
 
@@ -321,7 +429,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param project The project to check.
      * @return `true` if the `java` plugin has been applied.
      */
-    private boolean isGroovyProject(Project project) {
+    private static boolean isGroovyProject(Project project) {
         return project.tasks.findByName('compileGroovy') != null
     }
 
@@ -332,7 +440,7 @@ public class BaselinePlugin implements Plugin<Project> {
      * @param task Task to create an alias of.
      * @param alias Name of the alias.
      */
-    private void addTaskAlias(final Project project, final Task task) {
+    private static void addTaskAlias(final Project project, final Task task) {
         def aliasTaskName = 'bsl' + task.name.capitalize()
         def taskDescription = "${task.description.trim()}${task.description.endsWith('.') ? '' : '.'} Alias for `${task.name}`."
         project.task(aliasTaskName) {
