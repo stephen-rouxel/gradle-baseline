@@ -341,16 +341,29 @@ public class BaselinePlugin implements Plugin<Project> {
         final String prefix = s3DeployConfig.prefix
         final Set<String> filesToUpload = s3DeployConfig.filesToUpload
 
+        if (Strings.isNullOrEmpty(bucketName) && (filesToUpload == null || filesToUpload.
+                isEmpty())) {
+            // Return early if unset configuration. This prevents the task being added.
+            return
+        }
+
         project.task("bslDeployToS3") {
             group = "brightSPARK Labs - Baseline"
             description = "Upload files to an S3 bucket. Configure via the `bslBaseline` " +
                     "configuration block."
 
             doLast {
-                if (Strings.isNullOrEmpty(bucketName) || filesToUpload == null || filesToUpload.
-                        isEmpty()) {
-                    // Return early if missing configuration.
-                    return
+                // Throw an error if missing required configuration.
+                String missingConfig = null
+                if (Strings.isNullOrEmpty(bucketName)) {
+                    missingConfig = "deploy.s3.bucketName"
+                }
+                if (filesToUpload == null || filesToUpload.isEmpty()) {
+                    missingConfig = "deploy.s3.filesToUpload"
+                }
+                if (!Strings.isNullOrEmpty(missingConfig)) {
+                    throw new IllegalStateException("Missing configuration for task " +
+                    "`bslDeployToS3`: `${missingConfig}`")
                 }
 
                 final S3ClientBuilder s3Builder = S3Client.builder()
