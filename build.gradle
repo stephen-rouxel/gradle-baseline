@@ -76,6 +76,11 @@ dependencies {
             "org.owasp:dependency-check-gradle:8.4.0",
             "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:8.1.1",
             "com.github.jk1:gradle-license-report:2.5",
+
+            // NOTE: The dependencies below here are libraries and do not need to be added as plugins.
+
+            // We use `platform` to specify AWS SDK dependencies, as this is recommended by Amazon.
+            // See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-gradle.html
             platform('software.amazon.awssdk:bom:2.20.56'),
             'software.amazon.awssdk:s3:'
             )
