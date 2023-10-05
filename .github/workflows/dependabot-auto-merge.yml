@@ -17,25 +17,27 @@ permissions:
 
 jobs:
   dependabot:
-    runs-on: ubuntu-latest
-    # Run if Dependabot triggered the initial workflow run.
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    steps:
-      # Fetch the Dependabot metadata that describes the updated dependencies.
-      - name: Fetch Dependabot metadata
-        # Specify the ID used to access the output of this step.
-        id: metadata
-        # Specify that this step will run the `dependabot/fetch-metadata` action.
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Enable auto-merge for Dependabot PRs
-        # Auto-merge dependencies only for patch and minor updates.
-        if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'}}
-        # Merge the PR automatically once all status checks have passed.
-        # NOTE: To ensure no breaking changes are merged, the `Require status checks to pass
-        # before merging` option should be enabled in the branch protection rules.
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    # runs-on: ubuntu-latest
+    # # Run if Dependabot triggered the initial workflow run.
+    # if: ${{ github.actor == 'dependabot[bot]' }}
+    # steps:
+    #   # Fetch the Dependabot metadata that describes the updated dependencies.
+    #   - name: Fetch Dependabot metadata
+    #     # Specify the ID used to access the output of this step.
+    #     id: metadata
+    #     # Specify that this step will run the `dependabot/fetch-metadata` action.
+    #     uses: dependabot/fetch-metadata@v1
+    #     with:
+    #       github-token: "${{ secrets.GITHUB_TOKEN }}"
+    #   - name: Enable auto-merge for Dependabot PRs
+    #     # Auto-merge dependencies only for patch and minor updates.
+    #     if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'}}
+    #     # Merge the PR automatically once all status checks have passed.
+    #     # NOTE: To ensure no breaking changes are merged, the `Require status checks to pass
+    #     # before merging` option should be enabled in the branch protection rules.
+    #     run: gh pr merge --auto --merge "$PR_URL"
+    #     env:
+    #       PR_URL: ${{github.event.pull_request.html_url}}
+    #       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    uses: brightsparklabs/github-actions/.github/workflows/dependabot-auto-merge.yml@master
+
