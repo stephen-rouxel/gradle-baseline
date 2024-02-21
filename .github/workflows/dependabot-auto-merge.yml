@@ -13,7 +13,7 @@ on: pull_request
 
 jobs:
   call-gradle-workflow:
-    uses: brightsparklabs/github-actions/.github/workflows/gradle.yml@develop
+    uses: brightsparklabs/github-actions/.github/workflows/gradle.yml@feature/RAD-179-fix-dependabot-auto-merge
     secrets: inherit
     permissions:
       contents: write
