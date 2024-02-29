@@ -13,8 +13,11 @@ on: [pull_request, workflow_dispatch]
 
 jobs:
   call-gradle-workflow:
-    uses: brightsparklabs/github-actions/.github/workflows/gradle.yml@feature/RAD-179-fix-dependabot-auto-merge
+    uses: brightsparklabs/github-actions/.github/workflows/java.yml@feature/RAD-179-fix-dependabot-auto-merge
     secrets: inherit
     permissions:
       contents: write
       pull-requests: write
+    with:
+      # Publish gradle plugins independent of Maven.
+      publishToMaven: false
