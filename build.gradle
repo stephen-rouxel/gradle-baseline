@@ -28,13 +28,13 @@ plugins {
     // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE DEPENDENCIES BLOCK.
 
     // Apply the Spotless plugin for formatting.
-    id "com.diffplug.spotless" version "6.18.0"
+    id "com.diffplug.spotless" version "6.23.3"
 
     // Apply the Error Prone plugin for static code analysis.
     id "net.ltgt.errorprone" version "3.1.0"
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks.
-    id "com.github.ben-manes.versions" version "0.49.0"
+    id "com.github.ben-manes.versions" version "0.50.0"
     id "se.patrikerdes.use-latest-versions" version "0.2.18"
 
     // Apply the OWASP plugin for vulnerability dependency checks.
@@ -67,7 +67,7 @@ dependencies {
             // Add external plugins here so they can be added via our plugin.
             // NOTE: KEEP THESE VERSIONS ALIGNED WITH THE PLUGINS BLOCK.
             // NOTE: Obtain plugin dependency strings from plugins.gradle.org page.
-            "com.diffplug.spotless:spotless-plugin-gradle:6.25.0",
+            "com.diffplug.spotless:spotless-plugin-gradle:6.23.3",
             "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:3.1.0",
             // NOTE: ENSURE `BaselinePlugin.ERRORPRONE_CORE_VERSION` IS UPDATED AS APPROPRIATE.
             "com.google.errorprone:error_prone_core:2.24.1",
@@ -81,7 +81,7 @@ dependencies {
 
             // We use `platform` to specify AWS SDK dependencies, as this is recommended by Amazon.
             // See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-gradle.html
-            platform('software.amazon.awssdk:bom:2.24.4'),
+            platform('software.amazon.awssdk:bom:2.22.12'),
             'software.amazon.awssdk:s3:'
             )
 
@@ -97,7 +97,7 @@ dependencies {
 project.description = "Applies brightSPARK Labs standardisation to gradle projects"
 project.group       = "com.brightsparklabs"
 
-def versionProcess  = "git describe --always --dirty".execute()
+def versionProcess  = "git describe --tags --always --dirty".execute()
 versionProcess.waitFor()
 project.version     = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
