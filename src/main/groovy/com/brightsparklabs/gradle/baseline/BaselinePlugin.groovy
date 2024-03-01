@@ -63,7 +63,7 @@ public class BaselinePlugin implements Plugin<Project> {
         // set general properties
         project.group = "com.brightsparklabs"
 
-        def versionProcess = "git describe --always --dirty".execute()
+        def versionProcess = "git describe --tags --always --dirty".execute()
         versionProcess.waitFor()
         project.version = versionProcess.exitValue() == 0 ? versionProcess.text.trim() : "0.0.0-UNKNOWN"
 
