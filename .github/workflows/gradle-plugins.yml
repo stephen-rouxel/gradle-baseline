@@ -12,7 +12,7 @@ on: [pull_request, push]
  
 jobs:
   call-gradle-workflow:
-    uses: brightsparklabs/github-actions/.github/workflows/gradle-plugins.yml@develop
+    uses: brightsparklabs/github-actions/.github/workflows/gradle-plugins.yml@master
     secrets: inherit
     permissions:
       contents: write
