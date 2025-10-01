@@ -35,7 +35,7 @@ plugins {
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks.
     id "com.github.ben-manes.versions" version "0.52.0"
-    id "se.patrikerdes.use-latest-versions" version "0.2.18"
+    id "se.patrikerdes.use-latest-versions" version "0.2.19"
 
     // Apply the OWASP plugin for vulnerability dependency checks.
     id "org.owasp.dependencycheck" version "12.1.3"
