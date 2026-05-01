@@ -34,7 +34,7 @@ plugins {
     id "net.ltgt.errorprone" version "5.1.0"
 
     // Apply the Gradle Versions + Use Latest Versions plugins for stale dependency checks.
-    id "com.github.ben-manes.versions" version "0.53.0"
+    id "com.github.ben-manes.versions" version "0.54.0"
     id "se.patrikerdes.use-latest-versions" version "0.2.19"
 
     // Apply the OWASP plugin for vulnerability dependency checks.
@@ -71,7 +71,7 @@ dependencies {
             "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:5.1.0",
             // NOTE: ENSURE `BaselinePlugin.ERRORPRONE_CORE_VERSION` IS UPDATED AS APPROPRIATE.
             "com.google.errorprone:error_prone_core:2.48.0",
-            "com.github.ben-manes:gradle-versions-plugin:0.53.0",
+            "com.github.ben-manes:gradle-versions-plugin:0.54.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.19",
             "org.owasp:dependency-check-gradle:12.2.0",
             "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:8.1.1",
