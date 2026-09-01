@@ -38,7 +38,7 @@ plugins {
     id "se.patrikerdes.use-latest-versions" version "0.2.19"
 
     // Apply the OWASP plugin for vulnerability dependency checks.
-    id "org.owasp.dependencycheck" version "12.2.2"
+    id "org.owasp.dependencycheck" version "13.0.0"
 
     // Apply dependency licence report plugin.
     // Requires using version 2.0 or lower as the caching for the checkLicense task
@@ -73,7 +73,7 @@ dependencies {
             "com.google.errorprone:error_prone_core:2.50.0",
             "com.github.ben-manes:gradle-versions-plugin:0.54.0",
             "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.19",
-            "org.owasp:dependency-check-gradle:12.2.2",
+            "org.owasp:dependency-check-gradle:13.0.0",
             "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:8.1.1",
             "com.github.jk1:gradle-license-report:3.1.4",
 
